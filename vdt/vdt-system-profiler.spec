@@ -1,7 +1,6 @@
 %define clean_buildroot             [[ -n "%buildroot" && "%buildroot" != / ]] && rm -rf %buildroot
-%define clean_and_make_buildroot    %clean_buildroot && mkdir -p %buildroot
 
-#       v defined and true
+# defined and true
 %define is_true()                   %{expand:%%{?%{1}}%%{?!%{1}:0}}
 %define is_false()                  ! %{expand:%%{?%{1}}%%{?!%{1}:0}}
 
@@ -9,7 +8,7 @@ Summary: Profiles your system
 Name: vdt-system-profiler
 Version: 0.0.1
 Release: 1%{?dist}
-License: ASL 2.0
+License: Apache License, 2.0
 Group: Applications/Grid
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -52,18 +51,9 @@ exit 0
 
 
 
-# Disable FC12 auto-clean build root before %%install
-# We either do it ourselves or (in case of GPT_BUILD_MODE), we don't do it
-%define __spec_install_pre %{___build_pre}
-
 %install
-
-%clean_and_make_buildroot
-##############################################################################
-#
-# MAKE INSTALL, OTHER PACKAGING STEPS GO HERE
-#
-##############################################################################
+%clean_buildroot
+mkdir -p %buildroot
 mv * %buildroot
 
 
