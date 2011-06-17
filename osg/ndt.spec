@@ -9,7 +9,7 @@ Patch0: hello.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Packager: VDT <vdt-support@opensciencegrid.org>
-#BuildRequires:
+BuildRequires: zlib-devel
 #Requires:           initscripts
 #Requires(post):     chkconfig, /sbin/ldconfig
 #Requires(preun):    chkconfig
