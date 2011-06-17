@@ -15,6 +15,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Packager: VDT <vdt-support@opensciencegrid.org>
 AutoReq: yes
 AutoProv: yes
+BuildArch: noarch
 
 %define extract_dir %{name}-%{version}
 
