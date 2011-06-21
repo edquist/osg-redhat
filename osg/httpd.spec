@@ -1,60 +1,140 @@
 %define contentdir /var/www
 %define suexec_caller apache
 %define mmn 20051115
-%define mmnisa %{mmn}-%{__isa_name}-%{__isa_bits}
-%define vstring Fedora
-%define mpms worker event
+%define vstring CentOS 
+%define distro CentOS Enterprise Linux
+# Minimum version of OpenSSL having support for the secure TLS reneg API
+%define opensslver 0.9.8e-12.el5_4.4
 
 Summary: Apache HTTP Server
 Name: httpd
-Version: 2.2.17
-Release: 10%{?dist}.1
+Version: 2.2.3
+Release: 45%{?dist}.1
 URL: http://httpd.apache.org/
-Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.bz2
-Source1: index.html
+Source0: http://www.apache.org/dist/httpd/httpd-%{version}.tar.gz
+Source1: centos_index.html
 Source3: httpd.logrotate
 Source4: httpd.init
 Source5: httpd.sysconf
+Source8: centos_powered_by_rh.png
 Source10: httpd.conf
 Source11: ssl.conf
 Source12: welcome.conf
 Source13: manual.conf
-Source14: httpd.tmpfiles
+Source14: proxy_ajp.conf
 # Documentation
-Source31: httpd.mpm.xml
+Source30: migration.xml
+Source31: migration.css
+Source32: html.xsl
 Source33: README.confd
 # build/scripts patches
 Patch1: httpd-2.1.10-apctl.patch
 Patch2: httpd-2.1.10-apxs.patch
-Patch3: httpd-2.2.9-deplibs.patch
+Patch3: httpd-2.0.45-deplibs.patch
 Patch4: httpd-2.1.10-disablemods.patch
 Patch5: httpd-2.1.10-layout.patch
+Patch6: httpd-2.2.2-ac260.patch
 # Features/functional changes
 Patch20: httpd-2.0.48-release.patch
-Patch21: httpd-2.2.11-xfsz.patch
+Patch21: httpd-2.0.40-xfsz.patch
 Patch22: httpd-2.1.10-pod.patch
 Patch23: httpd-2.0.45-export.patch
-Patch24: httpd-2.2.11-corelimit.patch
-Patch25: httpd-2.2.11-selinux.patch
-Patch26: httpd-2.2.9-suenable.patch
+Patch24: httpd-2.0.48-corelimit.patch
+Patch25: httpd-2.0.54-selinux.patch
+Patch26: httpd-2.2.3-proxysessid.patch
+Patch27: httpd-2.2.3-proxypmatch.patch
+Patch28: httpd-2.2.3-nbchunk.patch
+Patch29: httpd-2.2.3-sslrenegsize.patch
+Patch30: httpd-2.2.3-ldapdyngrp.patch
+Patch31: httpd-2.2.3-modsubst.patch
 # Bug fixes
+Patch50: httpd-2.0.45-encode.patch
 Patch54: httpd-2.2.0-authnoprov.patch
-# VDT:
-Patch70: apachectl.patch
-License: ASL 2.0
+Patch55: httpd-2.2.3-proxyopt.patch
+Patch56: httpd-2.2.3-proxyoride.patch
+Patch57: httpd-2.0.52-logresline.patch
+Patch58: httpd-2.2.3-ldappool.patch
+Patch59: httpd-2.2.3-ssldynlock.patch
+Patch60: httpd-2.0.52-escaperrs.patch
+Patch61: httpd-2.2.3-eventdlock.patch
+Patch62: httpd-2.2.3-hdrsedit.patch
+Patch63: httpd-2.2.3-dummyreq.patch
+Patch64: httpd-2.2.3-proxysslhost.patch
+Patch65: httpd-2.2.3-pr46428.patch
+Patch66: httpd-2.2.3-cgierror.patch
+Patch67: httpd-2.2.3-pr43562.patch
+Patch68: httpd-2.2.3-logports.patch
+Patch69: httpd-2.2.3-graceful-ebadf.patch
+Patch70: httpd-2.2.3-sslrenegredir.patch
+Patch71: httpd-2.2.3-rewritelll.patch
+Patch72: httpd-2.2.3-extfiltereos.patch
+Patch73: httpd-2.2.3-cgierror2.patch
+Patch74: httpd-2.2.3-pngmagic.patch
+Patch75: httpd-2.2.3-defpidlog.patch
+Patch76: httpd-2.2.3-rewritedpi.patch
+Patch77: httpd-2.2.3-ldapremuser.patch
+Patch78: httpd-2.2.3-ldappassauth.patch
+Patch79: httpd-2.2.3-noxpad.patch
+Patch80: httpd-2.2.3-ajpbuffer.patch
+Patch81: httpd-2.2.3-sslflush.patch
+Patch82: httpd-2.2.3-expectnoka.patch
+Patch83: httpd-2.2.3-ssloidval.patch
+Patch84: httpd-2.2.3-sslreneg.patch
+Patch85: httpd-2.2.3-pr49328.patch
+Patch86: httpd-2.2.3-aboverflow.patch
+Patch87: httpd-2.2.3-pr40232.patch
+Patch88: httpd-2.2.3-davputfail.patch
+Patch89: httpd-2.2.3-dbdcleanup.patch
+Patch90: httpd-2.2.3-sslproxyio.patch
+# Security Fixes
+Patch100: httpd-2.2.3-CVE-2006-5752.patch
+Patch101: httpd-2.2.3-CVE-2007-1863.patch
+Patch102: httpd-2.2.3-CVE-2007-3304.patch
+Patch103: httpd-2.2.3-CVE-2007-3847.patch
+Patch104: httpd-2.2.3-CVE-2007-5000.patch
+Patch105: httpd-2.2.3-CVE-2007-4465.patch
+Patch106: httpd-2.2.3-CVE-2007-6421.patch
+Patch107: httpd-2.2.3-CVE-2007-6422.patch
+Patch108: httpd-2.2.3-CVE-2007-6388.patch
+Patch109: httpd-2.2.3-prftpcset.patch
+Patch110: httpd-2.2.3-CVE-2007-3304-update.patch
+Patch111: httpd-2.2.3-CVE-2008-2939.patch
+Patch112: httpd-2.2.3-CVE-2008-1678.patch
+Patch113: httpd-2.2.3-CVE-2009-1195.patch
+Patch114: httpd-2.2.3-ssicompat.patch
+Patch115: httpd-2.2.10-CVE-2009-1890.patch
+Patch116: httpd-2.2.10-CVE-2009-1891.patch
+Patch117: httpd-2.2.3-CVE-2009-3555.patch
+Patch118: httpd-2.2.3-CVE-2009-3094.patch
+Patch119: httpd-2.2.3-CVE-2009-3095.patch
+Patch120: httpd-2.2.3-CVE-2009-3555-p2.patch
+Patch121: httpd-2.2.3-CVE-2010-0434.patch
+Patch122: httpd-2.2.3-CVE-2010-0408.patch
+Patch123: httpd-2.2.3-CVE-2010-1452.patch
+Patch124: httpd-2.2.3-CVE-2010-2791.patch
+# Rebases
+Patch200: httpd-2.2.3-proxy229.patch
+Patch201: httpd-2.2.3-cache229.patch
+Patch202: httpd-2.2.3-deflate2215.patch
+# VDT
+Patch300: vdt-apachectl.patch
+
+License: Apache Software License
 Group: System Environment/Daemons
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: autoconf, perl, pkgconfig, findutils, xmlto
-BuildRequires: zlib-devel, libselinux-devel
-BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0
-Requires: initscripts >= 8.36, /etc/mime.types, system-logos >= 7.92.1-1
+BuildRoot: %{_tmppath}/%{name}-root
+BuildRequires: autoconf, perl, pkgconfig, xmlto >= 0.0.11, findutils
+BuildRequires: db4-devel, expat-devel, zlib-devel, libselinux-devel
+BuildRequires: apr-devel >= 1.2.0, apr-util-devel >= 1.2.0, pcre-devel >= 5.0, 
+Requires: /etc/mime.types, gawk, /usr/share/magic.mime, /usr/bin/find
+Requires: initscripts >= 8.36
 Obsoletes: httpd-suexec
-Requires(pre): /usr/sbin/useradd
-Requires(post): chkconfig
+Prereq: /sbin/chkconfig, /bin/mktemp, /bin/rm, /bin/mv
+Prereq: sh-utils, textutils, /usr/sbin/useradd
 Provides: webserver
-Provides: mod_dav = %{version}-%{release}, httpd-suexec = %{version}-%{release}
-Provides: httpd-mmn = %{mmn}, httpd-mmn = %{mmnisa}
-Requires: httpd-tools = %{version}-%{release}, apr-util-ldap, systemd-units
+Provides: httpd-mmn = %{mmn}
+Obsoletes: apache, secureweb, mod_dav, mod_gzip, stronghold-apache, stronghold-htdocs
+Obsoletes: mod_put, mod_roaming
+Conflicts: pcre < 4.0
 
 %description
 The Apache HTTP Server is a powerful, efficient, and extensible
@@ -62,7 +142,7 @@ web server.
 
 %package devel
 Group: Development/Libraries
-Summary: Development interfaces for the Apache HTTP server
+Summary: Development tools for the Apache HTTP server.
 Obsoletes: secureweb-devel, apache-devel, stronghold-apache-devel
 Requires: apr-devel, apr-util-devel, pkgconfig
 Requires: httpd = %{version}-%{release}
@@ -78,32 +158,23 @@ to install this package.
 
 %package manual
 Group: Documentation
-Summary: Documentation for the Apache HTTP server
+Summary: Documentation for the Apache HTTP server.
 Requires: httpd = %{version}-%{release}
 Obsoletes: secureweb-manual, apache-manual
-BuildArch: noarch
 
 %description manual
 The httpd-manual package contains the complete manual and
 reference guide for the Apache HTTP server. The information can
 also be found at http://httpd.apache.org/docs/2.2/.
 
-%package tools
-Group: System Environment/Daemons
-Summary: Tools for use with the Apache HTTP Server
-
-%description tools
-The httpd-tools package contains tools which can be used with 
-the Apache HTTP Server.
-
 %package -n mod_ssl
 Group: System Environment/Daemons
-Summary: SSL/TLS module for the Apache HTTP Server
+Summary: SSL/TLS module for the Apache HTTP server
 Epoch: 1
-BuildRequires: openssl-devel
-Requires(post): openssl, /bin/cat
-Requires(pre): httpd
-Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmnisa}
+BuildRequires: openssl-devel >= %{opensslver}, distcache-devel
+Requires(post): openssl >= 0.9.7f-4, /bin/cat
+Requires: httpd = 0:%{version}-%{release}, httpd-mmn = %{mmn}
+Requires: openssl >= %{opensslver}
 Obsoletes: stronghold-mod_ssl
 
 %description -n mod_ssl
@@ -118,30 +189,114 @@ Security (TLS) protocols.
 %patch3 -p1 -b .deplibs
 %patch4 -p1 -b .disablemods
 %patch5 -p1 -b .layout
+%patch6 -p1 -b .ac260
 
-%patch21 -p1 -b .xfsz
+%patch21 -p0 -b .xfsz
 %patch22 -p1 -b .pod
 %patch23 -p1 -b .export
 %patch24 -p1 -b .corelimit
 %patch25 -p1 -b .selinux
-%patch26 -p1 -b .suenable
+%patch26 -p1 -b .proxysessid
+%patch27 -p1 -b .proxypmatch
+%patch28 -p1 -b .nbchunk
+%patch29 -p1 -b .sslrenegsize
+%patch30 -p1 -b .ldapdyngrp
+%patch31 -p1 -b .modsubst
 
+# no -b to prevent droplets in install root
+%patch50 -p1
 %patch54 -p1 -b .authnoprov
+%patch55 -p1 -b .proxyopt
+%patch56 -p1 -b .proxyoride
+%patch57 -p1 -b .logresline
+%patch58 -p1 -b .ldappool
+%patch59 -p1 -b .ssldynlock
+%patch60 -p1 -b .escaperrs
+%patch61 -p1 -b .eventdlock
+%patch62 -p1 -b .hdrsedit
+%patch63 -p1 -b .dummyreq
+%patch64 -p1 -b .proxysslhost
+%patch65 -p1 -b .pr46428
+%patch66 -p1 -b .cgierror
+%patch67 -p1 -b .pr43562
+%patch68 -p1 -b .logports
+%patch69 -p1 -b .graceful-ebadf
+%patch70 -p1 -b .sslrenegredir
+%patch71 -p1 -b .rewritelll
+%patch72 -p1 -b .extfiltereos
+%patch73 -p1 -b .cgierror2
+%patch74 -p1 -b .pngmagic
+%patch75 -p1 -b .defpidlog
+%patch76 -p1 -b .rewritedpi
+%patch77 -p1 -b .ldapremuser
+%patch78 -p1 -b .ldappassauth
+%patch79 -p1 -b .noxpad
+#patch80 applied after proxy changes
+%patch81 -p1 -b .sslflush
+#patch82 applied after proxy changes
+%patch83 -p1 -b .ssloidval
+#patch84 applied after mod_ssl security fixes
+%patch85 -p1 -b .pr49328
+%patch86 -p1 -b .aboverflow
+%patch87 -p1 -b .pr40232
+%patch88 -p1 -b .davputfail
+%patch89 -p1 -b .dbdcleanup
+%patch90 -p1 -b .sslproxyio
 
-%patch70 -p0 -b .apachectl
+%patch100 -p1 -b .cve5752
+%patch101 -p1 -b .cve1853
+%patch102 -p1 -b .cve3304
+%patch103 -p1 -b .cve3847
+%patch104 -p1 -b .cve5000
+%patch105 -p1 -b .cve4465
+%patch106 -p1 -b .cve6421
+%patch107 -p1 -b .cve6422
+%patch108 -p1 -b .cve6388
+%patch109 -p1 -b .prftpcset
+%patch110 -p1 -b .cve3304-update
+%patch111 -p1 -b .cve2939
+%patch112 -p1 -b .cve1678
+%patch113 -p1 -b .cve1195
+# Not a security fix, but a fix for the -1195 patch:
+%patch114 -p1 -b .ssicompat
+#patch115 applied after proxy changes
+%patch116 -p1 -b .cve1891
+%patch117 -p1 -b .cve3555
+%patch118 -p1 -b .cve3094
+%patch119 -p1 -b .cve3095
+%patch120 -p1 -b .cve3555-p2
+%patch121 -p1 -b .cve0434
+%patch122 -p1 -b .cve0408
+%patch123 -p1 -b .cve1452
+#patch124 applied after proxy changes
+
+# Rebases -- any changes to proxy/cache modules must come later:
+%patch200 -p1 -b .proxy229
+%patch201 -p1 -b .cache229
+%patch202 -p1 -b .deflate2215
+
+%patch80 -p1 -b .ajpbuffer
+%patch82 -p1 -b .expectnoka
+
+%patch115 -p1 -b .cve1890
+%patch124 -p1 -b .cve2791
+
+%patch84 -p1 -b .sslreneg
+
+%patch300 -p1 -b .vdt-apachectl
 
 # Patch in vendor/release string
-sed "s/@RELEASE@/%{vstring}/" < %{PATCH20} | patch -p1
+sed "s/@VENDOR@/%{vstring}/;s/@RELEASE@/%{release}/" < %{PATCH20} | patch -p1 -b -z .release
 
 # Safety check: prevent build if defined MMN does not equal upstream MMN.
 vmmn=`echo MODULE_MAGIC_NUMBER_MAJOR | cpp -include include/ap_mmn.h | sed -n '/^2/p'`
 if test "x${vmmn}" != "x%{mmn}"; then
-   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}
+   : Error: Upstream MMN is now ${vmmn}, packaged MMN is %{mmn}.
    : Update the mmn macro and rebuild.
    exit 1
 fi
 
-: Building with MMN %{mmn}, MMN-ISA %{mmnisa} and vendor string '%{vstring}'
+: Building for '%{distro}' with MMN %{mmn} and vendor string '%{vstring}'
 
 %build
 # forcibly prevent use of bundled apr, apr-util, pcre
@@ -150,12 +305,27 @@ rm -rf srclib/{apr,apr-util,pcre}
 # regenerate configure scripts
 autoheader && autoconf || exit 1
 
+# Limit size of CHANGES to recent history
+echo '1,/Changes with Apache MPM/wq' | ed CHANGES
+
 # Before configure; fix location of build dir in generated apxs
 %{__perl} -pi -e "s:\@exp_installbuilddir\@:%{_libdir}/httpd/build:g" \
 	support/apxs.in
+# update location of migration guide in apachectl
+%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
+	support/apachectl.in
 
-export CFLAGS=$RPM_OPT_FLAGS
-export LDFLAGS="-Wl,-z,relro,-z,now"
+# Build the migration guide
+sed 's/@DISTRO@/%{distro}/' < $RPM_SOURCE_DIR/migration.xml > migration.xml
+xmlto -x $RPM_SOURCE_DIR/html.xsl html-nochunks migration.xml
+cp $RPM_SOURCE_DIR/migration.css . # make %%doc happy
+
+CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing"
+SH_LDFLAGS="-Wl,-z,relro"
+export CFLAGS SH_LDFLAGS
+
+# Forcibly disable use of rsync to install (#557049)
+export ac_cv_path_RSYNC=
 
 # Hard-code path to links to avoid unnecessary builddep
 export LYNX_PATH=/usr/bin/links
@@ -195,27 +365,17 @@ popd
 # Build everything and the kitchen sink with the prefork build
 mpmbuild prefork \
         --enable-mods-shared=all \
-	--enable-ssl --with-ssl --disable-distcache \
+	--enable-ssl --with-ssl --enable-distcache \
 	--enable-proxy \
-        --enable-cache \
-        --enable-disk-cache \
+        --enable-cache --enable-mem-cache \
+        --enable-file-cache --enable-disk-cache \
         --enable-ldap --enable-authnz-ldap \
         --enable-cgid \
-        --enable-authn-anon --enable-authn-alias \
-        --disable-imagemap
+        --enable-authn-anon --enable-authn-alias
 
 # For the other MPMs, just build httpd and no optional modules
-for f in %{mpms}; do
-   mpmbuild $f --enable-modules=none
-done
-
-# Build the man pages
-ymdate=`date +'%b %Y'`
-for mpm in %{mpms}; do
-    sed "s/@PROGNAME@/httpd.${mpm}/g;s/@DATE@/${ymdate}/g;s/@VERSION@/%{version}/g;s/@MPM@/${mpm}/g;" \
-        < $RPM_SOURCE_DIR/httpd.mpm.xml > httpd.${mpm}.8.xml
-    xmlto man httpd.${mpm}.8.xml
-done
+mpmbuild worker --enable-modules=none
+mpmbuild event --enable-modules=none
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -228,33 +388,25 @@ pushd prefork
 make DESTDIR=$RPM_BUILD_ROOT install
 popd
 
-# install alternative MPMs, and man pages
-for f in %{mpms}; do
-  install -m 755 ${f}/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.${f}
-  install -m 644 httpd.${f}.8 $RPM_BUILD_ROOT%{_mandir}/man8/httpd.${f}.8
-done
+# install alternative MPMs
+install -m 755 worker/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.worker
+install -m 755 event/httpd $RPM_BUILD_ROOT%{_sbindir}/httpd.event
 
 # install conf file/directory
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 install -m 644 $RPM_SOURCE_DIR/README.confd \
     $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/README
-for f in ssl.conf welcome.conf manual.conf; do
-  install -m 644 -p $RPM_SOURCE_DIR/$f \
-        $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
+for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf; do
+  install -m 644 $RPM_SOURCE_DIR/$f $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/$f
 done
 
 rm $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/*.conf
-install -m 644 -p $RPM_SOURCE_DIR/httpd.conf \
+install -m 644 $RPM_SOURCE_DIR/httpd.conf \
    $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf/httpd.conf
 
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-install -m 644 -p $RPM_SOURCE_DIR/httpd.sysconf \
+install -m 644 $RPM_SOURCE_DIR/httpd.sysconf \
    $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/httpd
-
-# tmpfiles.d configuration
-mkdir $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d 
-install -m 644 -p $RPM_SOURCE_DIR/httpd.tmpfiles \
-   $RPM_BUILD_ROOT%{_sysconfdir}/tmpfiles.d/httpd.conf
 
 # for holding mod_dav lock database
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/dav
@@ -271,17 +423,21 @@ mv $RPM_BUILD_ROOT%{_sbindir}/{ab,htdbm,logresolve,htpasswd,htdigest} \
    $RPM_BUILD_ROOT%{_bindir}
 
 # Make the MMN accessible to module packages
-echo %{mmnisa} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
+echo %{mmn} > $RPM_BUILD_ROOT%{_includedir}/httpd/.mmn
 
 # docroot
 mkdir $RPM_BUILD_ROOT%{contentdir}/html
-install -m 644 -p $RPM_SOURCE_DIR/index.html \
-        $RPM_BUILD_ROOT%{contentdir}/error/noindex.html
+install -m 644 $RPM_SOURCE_DIR/centos_index.html \
+	$RPM_BUILD_ROOT%{contentdir}/error/noindex.html
 
 # remove manual sources
 find $RPM_BUILD_ROOT%{contentdir}/manual \( \
     -name \*.xml -o -name \*.xml.* -o -name \*.ent -o -name \*.xsl -o -name \*.dtd \
     \) -print0 | xargs -0 rm -f
+
+# added for branding
+install -m 644 %{SOURCE8} \
+        $RPM_BUILD_ROOT%{contentdir}/icons/powered_by_rh.png
 
 # Strip the manual down just to English and replace the typemaps with flat files:
 set +x
@@ -293,28 +449,25 @@ for f in `find $RPM_BUILD_ROOT%{contentdir}/manual -name \*.html -type f`; do
 done
 set -x
 
-# Symlink for the powered-by-$DISTRO image:
-ln -s ../../..%{_datadir}/pixmaps/poweredby.png \
-        $RPM_BUILD_ROOT%{contentdir}/icons/poweredby.png
-
-# Set up /var directories
+# logs
 rmdir $RPM_BUILD_ROOT%{_sysconfdir}/httpd/logs
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/httpd
-mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/httpd
 
 # symlinks for /etc/httpd
 ln -s ../..%{_localstatedir}/log/httpd $RPM_BUILD_ROOT/etc/httpd/logs
-ln -s ../..%{_localstatedir}/run/httpd $RPM_BUILD_ROOT/etc/httpd/run
+ln -s ../..%{_localstatedir}/run $RPM_BUILD_ROOT/etc/httpd/run
 ln -s ../..%{_libdir}/httpd/modules $RPM_BUILD_ROOT/etc/httpd/modules
 
 # install SYSV init stuff
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -m755 $RPM_SOURCE_DIR/httpd.init \
 	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd
+%{__perl} -pi -e "s:\@docdir\@:%{_docdir}/%{name}-%{version}:g" \
+	$RPM_BUILD_ROOT/etc/rc.d/init.d/httpd	
 
 # install log rotation stuff
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
-install -m 644 -p $RPM_SOURCE_DIR/httpd.logrotate \
+install -m644 $RPM_SOURCE_DIR/httpd.logrotate \
 	$RPM_BUILD_ROOT/etc/logrotate.d/httpd
 
 # fix man page paths
@@ -323,7 +476,7 @@ sed -e "s|/usr/local/apache2/conf/httpd.conf|/etc/httpd/conf/httpd.conf|" \
     -e "s|/usr/local/apache2/conf/magic|/etc/httpd/conf/magic|" \
     -e "s|/usr/local/apache2/logs/error_log|/var/log/httpd/error_log|" \
     -e "s|/usr/local/apache2/logs/access_log|/var/log/httpd/access_log|" \
-    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd/httpd.pid|" \
+    -e "s|/usr/local/apache2/logs/httpd.pid|/var/run/httpd.pid|" \
     -e "s|/usr/local/apache2|/etc/httpd|" < docs/man/httpd.8 \
   > $RPM_BUILD_ROOT%{_mandir}/man8/httpd.8
 
@@ -356,6 +509,15 @@ chmod 755 $RPM_BUILD_ROOT%{_sbindir}/suexec
 /usr/sbin/useradd -c "Apache" -u 48 \
 	-s /sbin/nologin -r -d %{contentdir} apache 2> /dev/null || :
 
+%triggerpostun -- apache < 2.0, stronghold-apache < 2.0
+/sbin/chkconfig --add httpd
+
+# Prevent removal of index.html on upgrades from 1.3
+%triggerun -- apache < 2.0, stronghold-apache < 2.0
+if [ -r %{contentdir}/index.html -a ! -r %{contentdir}/index.html.rpmold ]; then
+  mv %{contentdir}/index.html %{contentdir}/index.html.rpmold
+fi
+
 %post
 # Register the httpd service
 /sbin/chkconfig --add httpd
@@ -365,9 +527,6 @@ if [ $1 = 0 ]; then
 	/sbin/service httpd stop > /dev/null 2>&1
 	/sbin/chkconfig --del httpd
 fi
-
-%posttrans
-/sbin/service httpd condrestart >/dev/null 2>&1 || :
 
 %define sslcert %{_sysconfdir}/pki/tls/certs/localhost.crt
 %define sslkey %{_sysconfdir}/pki/tls/private/localhost.key
@@ -386,7 +545,7 @@ fi
 
 if [ ! -f %{sslcert} ] ; then
 cat << EOF | %{_bindir}/openssl req -new -key %{sslkey} \
-         -x509 -days 365 -set_serial $RANDOM -extensions v3_req \
+         -x509 -days 365 -set_serial $RANDOM \
          -out %{sslcert} 2>/dev/null
 --
 SomeState
@@ -407,7 +566,7 @@ fi
 
 # Verify that the same modules were built into the httpd binaries
 ./prefork/httpd -l | grep -v prefork > prefork.mods
-for mpm in %{mpms}; do
+for mpm in worker; do
   ./${mpm}/httpd -l | grep -v ${mpm} > ${mpm}.mods
   if ! diff -u prefork.mods ${mpm}.mods; then
     : Different modules built into httpd binaries, will not proceed
@@ -422,6 +581,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 
 %doc ABOUT_APACHE README CHANGES LICENSE VERSIONING NOTICE
+%doc migration.html migration.css
 
 %dir %{_sysconfdir}/httpd
 %{_sysconfdir}/httpd/modules
@@ -430,21 +590,22 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/httpd/conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/httpd.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/welcome.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/proxy_ajp.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf/magic
 
 %config(noreplace) %{_sysconfdir}/logrotate.d/httpd
-%{_sysconfdir}/rc.d/init.d/httpd
+%config %{_sysconfdir}/rc.d/init.d/httpd
 
 %dir %{_sysconfdir}/httpd/conf.d
 %{_sysconfdir}/httpd/conf.d/README
 
 %config(noreplace) %{_sysconfdir}/sysconfig/httpd
-%config %{_sysconfdir}/tmpfiles.d/httpd.conf
 
+%{_bindir}/*
 %{_sbindir}/ht*
 %{_sbindir}/apachectl
 %{_sbindir}/rotatelogs
-%caps(cap_setuid,cap_setgid+pe) %attr(510,root,%{suexec_caller}) %{_sbindir}/suexec
+%attr(4510,root,%{suexec_caller}) %{_sbindir}/suexec
 
 %dir %{_libdir}/httpd
 %dir %{_libdir}/httpd/modules
@@ -463,19 +624,12 @@ rm -rf $RPM_BUILD_ROOT
 %config %{contentdir}/error/*.var
 %config %{contentdir}/error/include/*.html
 
-%attr(0710,root,apache) %dir %{_localstatedir}/run/httpd
 %attr(0700,root,root) %dir %{_localstatedir}/log/httpd
 %attr(0700,apache,apache) %dir %{_localstatedir}/lib/dav
 %attr(0700,apache,apache) %dir %{_localstatedir}/cache/mod_proxy
 
-%{_mandir}/man8/*
+%{_mandir}/man?/*
 %exclude %{_mandir}/man8/apxs.8*
-
-%files tools
-%defattr(-,root,root)
-%{_bindir}/*
-%{_mandir}/man1/*
-%doc LICENSE NOTICE
 
 %files manual
 %defattr(-,root,root)
@@ -501,209 +655,183 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/httpd/build/*.sh
 
 %changelog
-* Mon Mar  7 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10.1
-- rebuild for new APR (#681305)
+* Wed May  4 2011 Johnny Hughes <johnny@centos.org> - 2.2.3 -45.1.centos
+- Rolled in CentOS Branding
 
-* Wed Mar  2 2011 Joe Orton <jorton@redhat.com> - 2.2.17-10
-- rebuild
+* Fri Apr 15 2011 Joe Orton <jorton@redhat.com> - 2.2.3-45.1
+- mod_ssl: fix handling of incomplete lines w/rev. proxy (#694158)
 
-* Wed Feb 23 2011 Joe Orton <jorton@redhat.com> - 2.2.17-9
-- use arch-specific mmn
+* Mon Dec  6 2010 Joe Orton <jorton@redhat.com> - 2.2.3-45
+- ab: fail gracefully for OOM allocating stats structures (#645845)
+- init script: use $STOP_DELAY as delay before SIGKILL of parent (#644223)
+- mod_dav: don't delete the existing resource if a PUT fails (#572910)
+- core: don't replace Date header when acting as reverse proxy (#565865)
+- mod_dbd: fix pool usage (#633955)
 
-* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.17-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+* Thu Aug 19 2010 Joe Orton <jorton@redhat.com> - 2.2.3-44
+- mod_ssl: improved fix for SSLRequire's OID() function (#614423)
+- add security fixes for CVE-2010-1452, CVE-2010-2791 (#623211)
+- mod_deflate: rebase to 2.2.15 (#612211)
+- stop multiple invocations of filter init functions (#570628)
 
-* Mon Jan 31 2011 Joe Orton <jorton@redhat.com> - 2.2.17-7
-- generate dummy mod_ssl cert with CA:FALSE constraint (#667841)
-- add man page stubs for httpd.event, httpd.worker
-- drop distcache support
-- add STOP_TIMEOUT support to init script
+* Thu Mar  4 2010 Joe Orton <jorton@redhat.com> - 2.2.3-43
+- add security fixes for CVE-2010-0408, CVE-2010-0434 (#570441)
 
-* Sat Jan  8 2011 Joe Orton <jorton@redhat.com> - 2.2.17-6
-- update default SSLCipherSuite per upstream trunk
+* Tue Feb 23 2010 Joe Orton <jorton@redhat.com> - 2.2.3-42
+- require and BR a version of OpenSSL with the secure reneg API (#566659)
 
-* Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-5
-- fix requires (#667397)
+* Tue Feb 23 2010 Joe Orton <jorton@redhat.com> - 2.2.3-41
+- mod_ssl: add SSLInsecureRenegotiation (#566659)
 
-* Wed Jan  5 2011 Joe Orton <jorton@redhat.com> - 2.2.17-4
-- de-ghost /var/run/httpd
+* Mon Feb  1 2010 Joe Orton <jorton@redhat.com> - 2.2.3-40
+- mod_ssl: further fix for OID() handling (#552942)
 
-* Tue Jan  4 2011 Joe Orton <jorton@redhat.com> - 2.2.17-3
-- add tmpfiles.d configuration, ghost /var/run/httpd (#656600)
+* Thu Jan 28 2010 Joe Orton <jorton@redhat.com> - 2.2.3-39
+- prevent use of rsync during "make install" (#557049)
 
-* Sat Nov 20 2010 Joe Orton <jorton@redhat.com> - 2.2.17-2
-- drop setuid bit, use capabilities for suexec binary
+* Thu Jan 28 2010 Joe Orton <jorton@redhat.com> - 2.2.3-38
+- mod_ssl: fix additional case for OID() handling (#552942)
+- mod_authnz_ldap: fix handling of empty filter in group defn (#252038)
 
-* Wed Oct 27 2010 Joe Orton <jorton@redhat.com> - 2.2.17-1
-- update to 2.2.17
+* Tue Jan 19 2010 Joe Orton <jorton@redhat.com> - 2.2.3-37
+- mod_ssl: use ASN1_STRING_print() in SSLRequire's OID() (#552942)
 
-* Fri Sep 10 2010 Joe Orton <jorton@redhat.com> - 2.2.16-2
-- link everything using -z relro and -z now
+* Sun Dec 20 2009 Joe Orton <jorton@redhat.com> - 2.2.3-36
+- mod_ssl: add further mitigation for CVE-2009-3555 (#534042)
+- add mod_substitute (#539256)
 
-* Mon Jul 26 2010 Joe Orton <jorton@redhat.com> - 2.2.16-1
-- update to 2.2.16
+* Fri Dec 18 2009 Joe Orton <jorton@redhat.com> - 2.2.3-35.el5
+- mod_authnz_ldap: dynamic group fixes (#252038)
 
-* Fri Jul  9 2010 Joe Orton <jorton@redhat.com> - 2.2.15-3
-- default config tweaks:
- * harden httpd.conf w.r.t. .htaccess restriction (#591293)
- * load mod_substitute, mod_version by default
- * drop proxy_ajp.conf, load mod_proxy_ajp in httpd.conf
- * add commented list of shipped-but-unloaded modules
- * bump up worker defaults a little
- * drop KeepAliveTimeout to 5 secs per upstream
-- fix LSB compliance in init script (#522074)
-- bundle NOTICE in -tools
-- use init script in logrotate postrotate to pick up PIDFILE
-- drop some old Obsoletes/Conflicts
+* Thu Dec 17 2009 Joe Orton <jorton@redhat.com> - 2.2.3-34.el5
+- mod_authnz_ldap: add support for dynamic group lookup (#252038)
 
-* Sun Apr 04 2010 Robert Scheck <robert@fedoraproject.org> - 2.2.15-1
-- update to 2.2.15 (#572404, #579311)
+* Wed Dec 16 2009 Joe Orton <jorton@redhat.com> - 2.2.3-33.el5
+- add security fixes for CVE-2009-3555, CVE-2009-3094,
+  CVE-2009-3095 (#534042)
 
-* Thu Dec  3 2009 Joe Orton <jorton@redhat.com> - 2.2.14-1
-- update to 2.2.14
-- relax permissions on /var/run/httpd (#495780)
-- Requires(pre): httpd in mod_ssl subpackage (#543275)
-- add partial security fix for CVE-2009-3555 (#533125)
+* Wed Dec  2 2009 Joe Orton <jorton@redhat.com> - 2.2.3-32.el5
+- fix hard-coded default pidfile to match default config (#505002)
+- mod_ssl: fix potential hang in renegotiation (#510515)
+- drop legacy X-Pad header from short responses (#526110)
+- mod_proxy_ajp: fix handling of large uploads (#528640)
+- mod_authnz_ldap: add AuthLDAPRemoteUserAttribute directive (#520838)
+- mod_rewrite: add DiscardPathInfo flag (#517500)
+- mod_authnz_ldap: don't fail authz if no ldap-* configured (#448350)
+- disable keepalive for Expect: 100-continue and error response (#533407)
 
-* Tue Oct 27 2009 Tom "spot" Callaway <tcallawa@redhat.com> 2.2.13-4
-- add additional explanatory text to test page to help prevent legal emails to Fedora
+* Tue Jul 14 2009 Joe Orton <jorton@redhat.com> 2.2.3-31.el5
+- mod_rewrite: correct backport of URI escaping fix (#480604)
 
-* Tue Sep  8 2009 Joe Orton <jorton@redhat.com> 2.2.13-2
-- restart service in posttrans (#491567)
+* Fri Jul 10 2009 Joe Orton <jorton@redhat.com> 2.2.3-30.el5
+- add security fixes for CVE-2009-1890, CVE-2009-1891 (#509783)
 
-* Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 2.2.13-2
-- rebuilt with new openssl
+* Mon Jun 22 2009 Joe Orton <jorton@redhat.com> 2.2.3-29.el5
+- add image/png to conf/magic (#240844)
 
-* Tue Aug 18 2009 Joe Orton <jorton@redhat.com> 2.2.13-1
-- update to 2.2.13
+* Tue Jun 16 2009 Joe Orton <jorton@redhat.com> 2.2.3-28.el5
+- fix backwards compat for CVE-2009-1195 fix (#502998)
 
-* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.11-10
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+* Wed May 20 2009 Joe Orton <jorton@redhat.com> 2.2.3-27.el5
+- mod_cgi, mod_cgid: fix logging on input read error (#498170)
+- mod_rewrite: don't serialize logfile access (#493023)
+- mod_ext_filter: fix spurious error log output (#479463)
 
-* Tue Jun 16 2009 Joe Orton <jorton@redhat.com> 2.2.11-9
-- build -manual as noarch
+* Fri May 15 2009 Joe Orton <jorton@redhat.com> 2.2.3-26.el5
+- add security fixes for CVE-2008-1678, CVE-2009-1195 (#499285)
 
-* Tue Mar 17 2009 Joe Orton <jorton@redhat.com> 2.2.11-8
-- fix pidfile in httpd.logrotate (thanks to Rainer Traut)
-- don't build mod_mem_cache or mod_file_cache
+* Fri Apr 17 2009 Joe Orton <jorton@redhat.com> 2.2.3-25.el5
+- mod_rewrite: fix URI escaping with [P] in directory context (#480604)
+- mod_cgi: fix headers/status in error responses (#480932)
+- mod_speling: fix handling of directory names (#485524)
+- init script: use ${pidfile} in more places (#491135)
+- mod_log_config: support remote/local with 'p' format (#493070)
+- remove Obsolete for mod_jk (#493592)
+- mod_ssl: fix SSL per-dir-reneg buffering with internal redirects (#488886)
+- fix spurious error messages on graceful restart (#233955)
 
-* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.2.11-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+* Wed Mar 18 2009 Joe Orton <jorton@redhat.com> 2.2.3-24.el5
+- mod_ssl: add SSLRenegBufferSize directive (#479806)
 
-* Thu Jan 22 2009 Joe Orton <jorton@redhat.com> 2.2.11-6
-- Require: apr-util-ldap (#471898)
-- init script changes: pass pidfile to status(), use status() in
-  condrestart (#480602), support try-restart as alias for
-  condrestart
-- change /etc/httpd/run symlink to have destination /var/run/httpd,
-  and restore "run/httpd.conf" as default PidFile (#478688)
+* Fri Feb  6 2009 Joe Orton <jorton@redhat.com> 2.2.3-23.el5
+- mod_proxy: set c->remote_host for backend SSL connection (#479410)
 
-* Fri Jan 16 2009 Tomas Mraz <tmraz@redhat.com> 2.2.11-5
-- rebuild with new openssl
+* Wed Nov 12 2008 Joe Orton <jorton@redhat.com> 2.2.3-22.el5
+- add security fixes for CVE-2008-2939 (#468841)
+- note that the mod_proxy 2.2.9 rebase fixed CVE-2008-2634
 
-* Sat Dec 27 2008 Robert Scheck <robert@fedoraproject.org> 2.2.11-4
-- Made default configuration using /var/run/httpd for pid file
+* Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.3-21.el5
+- avoid strict-aliasing warnings (#462877)
 
-* Thu Dec 18 2008 Joe Orton <jorton@redhat.com> 2.2.11-3
-- update to 2.2.11
-- package new /var/run/httpd directory, and move default pidfile
-  location inside there
+* Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.3-20.el5
+- mod_proxy: scoreboard access fix (#252024)
 
-* Tue Oct 21 2008 Joe Orton <jorton@redhat.com> 2.2.10-2
-- update to 2.2.10
+* Thu Sep 18 2008 Joe Orton <jorton@redhat.com> 2.2.3-19.el5
+- mod_proxy: various backport fixes (#252024)
 
-* Tue Jul 15 2008 Joe Orton <jorton@redhat.com> 2.2.9-5
-- move AddTypes for SSL cert/CRL types from ssl.conf to httpd.conf (#449979)
+* Thu Sep 18 2008 Joe Orton <jorton@redhat.com> 2.2.3-17.el5
+- fix mod_proxy symbol use
 
-* Mon Jul 14 2008 Joe Orton <jorton@redhat.com> 2.2.9-4
-- use Charset=UTF-8 in default httpd.conf (#455123)
-- only enable suexec when appropriate (Jim Radford, #453697)
+* Mon Sep 15 2008 Joe Orton <jorton@redhat.com> 2.2.3-16.el5
+- mod_proxy*, mod_cache*: rebase to 2.2.9 (#252024, #249534,
+  #439842)
+- backport changes to make chunk filter non-blocking (#454098)
 
-* Thu Jul 10 2008 Tom "spot" Callaway <tcallawa@redhat.com>  2.2.9-3
-- rebuild against new db4 4.7
+* Fri Sep 12 2008 Joe Orton <jorton@redhat.com> 2.2.3-15.el5
+- mod_ldap: fix memory lifetime issues (#440259)
+- mod_ssl: configure OpenSSL dynamic lock callbacks (#462044)
+- escape the Request-Method in canned error responses (#445888)
+- build the event MPM and fix a deadlock therein (#444643)
+- mod_headers: support "RequestHeader edit" (#428253)
+- use "OPTIONS *" rather than "GET /" in dummy connection (#367981)
 
-* Tue Jul  8 2008 Joe Orton <jorton@redhat.com> 2.2.9-2
-- update to 2.2.9
-- build event MPM too
+* Thu Aug 14 2008 Joe Orton <jorton@redhat.com> 2.2.3-14.el5
+- mod_proxy: add ProxyPassMatch support (#449159)
 
-* Wed Jun  4 2008 Joe Orton <jorton@redhat.com> 2.2.8-4
-- correct UserDir directive in default config (#449815)
+* Mon Jul 21 2008 Joe Orton <jorton@redhat.com> 2.2.3-13.el5
+- mod_proxy_balancer: allow alternative string to match for
+  stickysession parameter (#439218)
+- fix dist tag in Release (#440615)
 
-* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 2.2.8-3
-- Autorebuild for GCC 4.3
+* Fri Jan 11 2008 Joe Orton <jorton@redhat.com> 2.2.3-12.el5_1.3
+- further update to backport for CVE-2007-6421 (#427240)
 
-* Tue Jan 22 2008 Joe Orton <jorton@redhat.com> 2.2.8-2
-- update to 2.2.8
-- drop mod_imagemap
+* Fri Jan 11 2008 Joe Orton <jorton@redhat.com> 2.2.3-12.el5_1.2
+- updated backport for CVE-2007-6421 (#427240)
 
-* Wed Dec 05 2007 Release Engineering <rel-eng at fedoraproject dot org> - 2.2.6-4
- - Rebuild for openssl bump
+* Mon Jan  7 2008 Joe Orton <jorton@redhat.com> 2.2.3-11.el5_1.1
+- add security fixes for CVE-2007-6388, CVE-2007-6421
+  and CVE-2007-6422 (#427240)
+- add security fix for CVE-2007-4465, CVE-2007-5000 (#421631)
+- add security fix for mod_proxy_ftp UTF-7 XSS (#427745)
 
-* Mon Sep 17 2007 Joe Orton <jorton@redhat.com> 2.2.6-3
-- add fix for SSL library string regression (PR 43334)
-- use powered-by logo from system-logos (#250676)
-- preserve timestamps for installed config files
+* Mon Aug  6 2007 Joe Orton <jorton@redhat.com> 2.2.3-11.el5
+- mark httpd.conf config(noreplace) (#247881)
 
-* Fri Sep  7 2007 Joe Orton <jorton@redhat.com> 2.2.6-2
-- update to 2.2.6 (#250757, #282761)
+* Fri Aug  3 2007 Joe Orton <jorton@redhat.com> 2.2.3-10.el5
+- add security fix for CVE-2007-3847 (#250761)
 
-* Sun Sep  2 2007 Joe Orton <jorton@redhat.com> 2.2.4-10
-- rebuild for fixed APR
+* Wed Aug  1 2007 Joe Orton <jorton@redhat.com> 2.2.3-9.el5
+- load mod_version by default (#247881)
 
-* Wed Aug 22 2007 Joe Orton <jorton@redhat.com> 2.2.4-9
-- rebuild for expat soname bump
+* Tue Jun 26 2007 Joe Orton <jorton@redhat.com> 2.2.3-8.el5
+- add 'ServerTokens Full-Release' config option (#240857)
+- use init script in logrotate postrotate (#241680)
+- fix mod_proxy option inheritance (#245719)
+- fix ProxyErrorOverride to only affect 4xx, 5xx responses (#240024)
+- bump logresolve line buffer length to 10K (#245763)
+- add security fixes for CVE-2007-1863, CVE-2007-3304,
+  and CVE-2006-5752 (#244666)
 
-* Tue Aug 21 2007 Joe Orton <jorton@redhat.com> 2.2.4-8
-- fix License
-- require /etc/mime.types (#249223)
-
-* Thu Jul 26 2007 Joe Orton <jorton@redhat.com> 2.2.4-7
-- drop -tools dependency on httpd (thanks to Matthias Saou)
-
-* Wed Jul 25 2007 Joe Orton <jorton@redhat.com> 2.2.4-6
-- split out utilities into -tools subpackage, based on patch
-  by Jason Tibbs (#238257)
-
-* Tue Jul 24 2007 Joe Orton <jorton@redhat.com> 2.2.4-5
-- spec file cleanups: provide httpd-suexec, mod_dav; 
- don't obsolete mod_jk; drop trailing dots from Summaries
-- init script
- * add LSB info header, support force-reload (#246944)
- * update description
- * drop 1.3 config check
- * pass $pidfile to daemon and pidfile everywhere
-
-* Wed May  9 2007 Joe Orton <jorton@redhat.com> 2.2.4-4
-- update welcome page branding
-
-* Tue Apr  3 2007 Joe Orton <jorton@redhat.com> 2.2.4-3
-- drop old triggers, old Requires, xmlto BR
-- use Requires(...) correctly 
-- use standard BuildRoot 
-- don't mark init script as config file
-- trim CHANGES further
-
-* Mon Mar 12 2007 Joe Orton <jorton@redhat.com> 2.2.4-2
-- update to 2.2.4
-- drop the migration guide (#223605)
-
-* Thu Dec  7 2006 Joe Orton <jorton@redhat.com> 2.2.3-8
+* Wed Nov 29 2006 Joe Orton <jorton@redhat.com> 2.2.3-6.el5
 - fix path to instdso.sh in special.mk (#217677)
 - fix detection of links in "apachectl fullstatus"
 
-* Tue Dec  5 2006 Joe Orton <jorton@redhat.com> 2.2.3-7
-- rebuild for libpq soname bump
+* Tue Sep 19 2006 Joe Orton <jorton@redhat.com> 2.2.3-5.el5
+- rebuild
 
-* Sat Nov 11 2006 Joe Orton <jorton@redhat.com> 2.2.3-6
-- rebuild for BDB soname bump
-
-* Mon Sep 11 2006 Joe Orton <jorton@redhat.com> 2.2.3-5
-- updated "powered by Fedora" logo (#205573, Diana Fong)
-- tweak welcome page wording slightly (#205880)
-
-* Fri Aug 18 2006 Jesse Keating <jkeating@redhat.com> - 2.2.3-4
-- rebuilt with latest binutils to pick up 64K -z commonpagesize on ppc*
-  (#203001)
+* Fri Aug 11 2006 Joe Orton <jorton@redhat.com> 2.2.3-3.el5
+- use RHEL branding
 
 * Thu Aug  3 2006 Joe Orton <jorton@redhat.com> 2.2.3-3
 - init: use killproc() delay to avoid race killing parent
