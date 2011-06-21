@@ -1,0 +1,43 @@
+--- support/apachectl.in.apachectl	2011-06-20 16:42:01.000000000 -0500
++++ support/apachectl.in	2011-06-20 16:56:01.000000000 -0500
+@@ -70,6 +70,11 @@
+ ULIMIT_MAX_FILES="@APACHECTL_ULIMIT@"
+ # --------------------                              --------------------
+ # ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
++ 
++# Default the config file location for the VDT
++if echo $ARGV | grep -v -- -f - ; then
++    ARGV="$ARGV -f $VDT_LOCATION/apache/conf/httpd.conf"
++fi
+ 
+ # Set the maximum number of file descriptors allowed per child process.
+ if [ "x$ULIMIT_MAX_FILES" != "x" ] ; then
+@@ -98,12 +103,17 @@
+ fi
+ ERROR=$?
+ }
++REDHAT_LOCKFILE=/var/lock/subsys/apache
+ 
+ case $ARGV in
+ restart|graceful)
+     if $HTTPD $OPTIONS -t >&/dev/null; then
+        $HTTPD $OPTIONS -k $ARGV
+        ERROR=$?
++
++       if [ -f /etc/redhat-release ]; then
++           [ $ERROR -eq 0 ] && touch $REDHAT_LOCKFILE 
++       fi
+     else
+        echo "apachectl: Configuration syntax error, will not run \"$ARGV\":"
+        testconfig
+@@ -112,6 +122,10 @@
+ start|stop|graceful-stop)
+     $HTTPD $OPTIONS -k $ARGV
+     ERROR=$?
++    
++    if [ -f /etc/redhat-release ]; then
++        [ $ERROR -eq 0 ] && rm -f $REDHAT_LOCKFILE
++    fi
+     ;;
+ configtest)
+     testconfig
