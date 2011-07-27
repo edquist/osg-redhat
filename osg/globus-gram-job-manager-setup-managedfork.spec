@@ -1,6 +1,6 @@
 %{!?perl_vendorlib: %global perl_vendorlib %(eval "`perl -V:installvendorlib`"; echo $installvendorlib)}
 
-Name:           globus-gram-job-manager-managed-fork
+Name:           globus-gram-job-manager-setup-managedfork
 Version:        2.0.0
 Release:        1%{?dist}
 Summary:        Globus Toolkit - Fork Job Manager Setup
@@ -31,7 +31,11 @@ prevent high job load from occuring on the gatekeeper that can paralyze a site.
 %setup -q -n Globus-ManagedFork-Setup
 
 %build
-#No build necessary for this package
+#Patch jobmanager file
+
+sed -i "s/MAGIC_VDT_LOCATION\/globus\/libexec/\/usr\/sbin/" globus/etc/grid-services/jobmanager-managedfork
+sed -i "s/MAGIC_VDT_LOCATION\/globus\/etc/\/etc/" globus/etc/grid-services/jobmanager-managedfork
+
 
 %install
 
@@ -45,11 +49,12 @@ install -m 644 globus/lib/perl/Globus/GRAM/JobManager/managedfork.pm $RPM_BUILD_
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/globus
 install -m 644 globus/share/globus_gram_job_manager/managedfork.rvf $RPM_BUILD_ROOT%{_datadir}/globus
 
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/grid-services
+install -m 755 globus/etc/grid-services/jobmanager-managedfork $RPM_BUILD_ROOT%{_sysconfdir}/grid-services/
 
 %files
 %{_datadir}/globus/managedfork.rvf
 %{perl_vendorlib}/Globus/GRAM/JobManager/managedfork.pm
 %{_docdir}/%{name}-%{version}/notes.html
-
-
+%{_sysconfdir}/grid-services/jobmanager-managedfork
 
