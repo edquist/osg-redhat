@@ -1,50 +1,54 @@
 Name:           osg-ca-certs
-Version:        3
-Release:        2
-Summary:        Metapackage to bring in the appropriate CA certs
+Version:        1.20
+Release:        1
+Epoch:          1
+Summary:        OSG Packaging of the IGTF CA Certs and OSG-specific CAs
 
 Group:          System Environment/Base
-License:        GPL
-URL:            http://vdt.cs.wisc.edu/releases/2.0.0/certificate_authorities.html
-#Source0:        osg-ca-certs.tar.gz
+License:        Unknown
+URL:            http://software.grid.iu.edu/pacman/cadist/
+
+# Note: currently, one needs a valid client certificate to access the source tarball
+# https://osg-svn.rtinfo.indiana.edu/cadist/release/osg-certificates-1.20.tar.gz
+Source0:        osg-certificates-1.20.tar.gz
+
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-#BuildRequires:  
-Requires:       vdt-ca-certs
-Provides:       grid-certificates
+Provides:       grid-certificates = 7
 
+Conflicts:      osg-ca-manage
+Obsoletes:      vdt-ca-certs < 61
 
 %description
 %{summary}
 
 %prep
-
+%setup -q -n certificates
 
 %build
 
-
 %install
 rm -rf $RPM_BUILD_ROOT
-#make install DESTDIR=$RPM_BUILD_ROOT
-
+mkdir -p $RPM_BUILD_ROOT/etc/grid-security/certificates
+install -m 0644 * $RPM_BUILD_ROOT/etc/grid-security/certificates/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %files
-%defattr(-,root,root,-)
+%defattr(0644,root,root,-)
+%dir %attr(0755,-,-) /etc/grid-security/certificates
+/etc/grid-security/certificates/*
 %doc
 
-
-
 %changelog
+* Mon Aug 15 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 1.20-1
+- Update to use the package from osg-security.  Bumped epoch number to prevent confusion with old versioning.
+
 * Fri Jul 22 2011 Derek Weitzel <dweitzel@cse.unl.edu> - 3-2
 - Add provdes grid-certificates
 
 * Fri Jul 08 2011 Derek Weitzel <dweitzel@cse.unl.edu> - 3-1
 - Initial creation of RPM to pull in vdt-ca-certs.
-
-
 
