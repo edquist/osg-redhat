@@ -1,5 +1,5 @@
-Name:      dCache-gratia-probe 
-Summary:   dCache-gratia-probe
+Name:      dcache-gratia-probe 
+Summary:   dcache-gratia-probe
 Version:   3.0.0
 Release:   1
 License:   Apache 2.0
