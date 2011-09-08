@@ -1,4 +1,4 @@
-Name:           osg-ca-certs
+Name:           osg-ca-certs-compat
 Version:        1.20
 Release:        3
 Epoch:          1
