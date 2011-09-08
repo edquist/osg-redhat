@@ -14,7 +14,7 @@ Source0:        osg-certificates-1.20IGTFOLD.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-Provides:       grid-certificates = 5
+Provides:       grid-certificates = 4
 
 Conflicts:      osg-ca-scripts
 Obsoletes:      vdt-ca-certs < 61
@@ -43,7 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Thu Sep 8 2011 Anand Padmanabhan <apadmana@uiuc.edu> - 1.40-5
-- Changed name from osg-ca-certs to igtf-ca-certs-compat
+- Changed name from igtf-ca-certs to igtf-ca-certs-compat
 
 * Thu Aug 18 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 1.40-4
 Fix conflicts and obsoletes.
