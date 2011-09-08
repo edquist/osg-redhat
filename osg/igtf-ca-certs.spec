@@ -1,6 +1,6 @@
-Name:           igtf-ca-certs-experimental
+Name:           igtf-ca-certs
 Version:        1.40
-Release:        3
+Release:        4
 Summary:        OSG Packaging of the IGTF CA Certs
 
 Group:          System Environment/Base
@@ -14,9 +14,11 @@ Source0:        osg-certificates-1.20IGTFNEW.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-Provides:       grid-certificates = 4
+Provides:       grid-certificates = 5
 
 Conflicts:      osg-ca-scripts
+
+Obsoletes:      vdt-ca-certs
 
 %description
 %{summary}
@@ -41,6 +43,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc
 
 %changelog
+* Thu Sep 8 2011 Anand Padmanabhan <apadmana@uiuc.edu> - 1.40-5
+- Changed name from igtf-ca-certs-experimental to igtf-ca-certs
+
 * Thu Aug 18 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 1.40-3
 Fix conflicts line.
 
