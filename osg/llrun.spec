@@ -1,7 +1,7 @@
 Summary: Performs a test run for LCAS and/or LCMAPS
 Name: llrun
 Version: 0.1.3
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 Vendor: Nikhef
 License: ASL 2.0
 Group: Applications/System
@@ -36,6 +36,9 @@ make DESTDIR=$RPM_BUILD_ROOT install
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Thu Mar 08 2012 Mischa Salle <msalle@nikhef.nl> 0.1.3-1.2.osg
+- Rebuild after merging from branches/lcmaps-upgrade into trunk
+
 * Mon Mar 5 2012 Mischa Salle <msalle@nikhef.nl> 0.1.3-1.1.osg
 - Imported to OSG
 
