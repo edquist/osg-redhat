@@ -1,7 +1,7 @@
 Summary: Environment wrapper scripts for gLExec
 Name: glexec-wrapper-scripts
 Version: 0.0.6
-Release: 1.1%{?dist}
+Release: 1.2%{?dist}
 Vendor: Nikhef
 License: ASL 2.0
 Group: Applications/System
@@ -37,6 +37,9 @@ ln -s -f glexec_wrap.sh $RPM_BUILD_ROOT%{_sbindir}/glexec_warp.sh
 rm -rf $RPM_BUILD_ROOT
 
 %changelog
+* Thu Mar 08 2012 Dave Dykstra <dwd@fnal.gov> 0.0.6-1.2.osg
+- Rebuild after merging into trunk
+
 * Mon Feb 27 2012 Dave Dykstra <dwd@fnal.gov> 0.0.6-1.1.osg
 - Import into OSG
 
