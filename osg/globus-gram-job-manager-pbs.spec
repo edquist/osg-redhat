@@ -16,13 +16,14 @@
 Name:		globus-gram-job-manager-pbs
 %global _name %(tr - _ <<< %{name})
 Version:	1.6
-Release:	1.1%{?dist}
+Release:	1.2%{?dist}
 Summary:	Globus Toolkit - PBS Job Manager
 
 Group:		Applications/Internet
 License:	ASL 2.0
 URL:		http://www.globus.org/
 Source:		http://www.globus.org/ftppub/gt5/5.2/5.2.2/packages/src/%{_name}-%{version}.tar.gz
+Source1:        pbs.rvf
 Patch1:     osg-teragrid-pbs.patch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes:      globus-gram-job-manager-setup-pbs < 4.5
@@ -177,6 +178,10 @@ GLOBUSPACKAGEDIR=$RPM_BUILD_ROOT%{_datadir}/globus/packages
 find $RPM_BUILD_ROOT%{_libdir} -name 'lib*.la' -exec rm -v '{}' \;
 sed '/lib.*\.la$/d' -i $GLOBUSPACKAGEDIR/%{_name}/%{flavor}_dev.filelist
 
+# Install the RVF file
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/globus/gram/
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/globus/gram/pbs.rvf
+
 
 # Generate package filelists
 # Main package: pbs.pm and globus-pbs.config
@@ -258,6 +263,7 @@ fi
 %dir %{_datadir}/globus/packages/%{_name}
 %dir %{_docdir}/%{name}-%{version}
 %config(noreplace) %{_sysconfdir}/globus/globus-pbs.conf
+%config(noreplace) %{_sysconfdir}/globus/gram/pbs.rvf 
 
 %files setup-poll -f package-setup-poll.filelist
 %defattr(-,root,root,-)
@@ -272,6 +278,9 @@ fi
 %dir %{_docdir}/%{name}-%{version}/html
 
 %changelog
+* Fri Nov 02 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 1.6-1.2
+- Add placeholder file for user-editable pbs.rvf
+
 * Wed Sep 12 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 1.6-1.1
 - Add OSG/TeraGrid patch
 
