@@ -1,5 +1,5 @@
 
-Name: condor-ce
+Name: htcondor-ce
 Version: 0.5.3
 Release: 1%{?dist}
 Summary: A framework to run HTCondor as a CE
@@ -60,7 +60,7 @@ Requires: /usr/bin/voms-proxy-init
 %{summary}
 
 %prep
-%setup -q
+%setup -q -n condor-ce-%{version}
 
 %build
 %configure
