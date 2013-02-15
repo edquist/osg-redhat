@@ -19,7 +19,7 @@ Patch0: no-ssl-proxies-tomcat.patch
 BuildArch: noarch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: java-devel
+BuildRequires: java7-devel
 BuildRequires: jpackage-utils
 %if "%{?rhel}" == "6"
 BuildRequires: maven22
@@ -28,7 +28,7 @@ BuildRequires: maven2
 %endif
 BuildRequires: bouncycastle
 
-Requires: java
+Requires: java7
 Requires: jpackage-utils
 Requires: bouncycastle
 Requires: log4j
