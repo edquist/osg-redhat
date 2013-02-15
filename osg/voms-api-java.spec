@@ -37,7 +37,7 @@ ExcludeArch:	ppc
 ExcludeArch:	ppc64
 %endif
 
-Requires:	java
+Requires:	java7
 Requires:	jpackage-utils
 Requires:	bouncycastle >= 1.39
 Requires:	jakarta-commons-cli
@@ -47,7 +47,7 @@ Requires:	log4j
 Provides:	vomsjapi = %{version}-%{release}
 Obsoletes:	vomsjapi < 2.0.7
 
-BuildRequires:	java-devel >= 1:1.6.0
+BuildRequires:	java7-devel
 BuildRequires:	jpackage-utils
 
 %if %maven
