@@ -19,6 +19,12 @@ BuildRequires: argus-pep-api-java >= 2.1.0
 BuildRequires: emi-trustmanager
 BuildRequires: voms-api-java
 %endif
+# previously java was implied by subpackages
+BuildRequires: java7-devel
+BuildRequires: jpackage-utils
+Requires: java7-devel
+Requires: jpackage-utils
+
 
 %if 0%{?rhel} > 5
 %global _tomcat tomcat6
