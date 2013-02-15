@@ -8,7 +8,8 @@ Group: System Environment/Libraries
 Packager: ETICS
 BuildArch: noarch
 BuildRequires: bouncycastle
-BuildRequires: java-devel-sun
+BuildRequires: java7-devel
+BuildRequires: jpackage-utils
 %if 0%{rhel} <= 5
 BuildRequires: tomcat5
 %endif
@@ -18,7 +19,8 @@ BuildRequires: tomcat6
 BuildRequires: emi-trustmanager
 BuildRequires: ant
 BuildRequires: log4j
-Requires: java-sun
+Requires: java7-devel
+Requires: jpackage-utils
 Requires: bouncycastle
 Requires: emi-trustmanager
 Requires: log4j
