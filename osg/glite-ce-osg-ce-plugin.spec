@@ -1,7 +1,7 @@
 Summary: The plugin is a sensor for the CE monitor service that accesses the Open Science Grid information system
 Name: glite-ce-osg-ce-plugin
 Version: 1.13.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: Apache License 2.0
 Vendor: EMI
 Group: System Environment/Libraries
@@ -10,10 +10,15 @@ BuildArch: noarch
 BuildRequires: ant
 BuildRequires: glite-ce-monitor-api-java
 BuildRequires: glite-ce-common-java
+BuildRequires: java7-devel
+BuildRequires: jpackage-utils
+Requires: java7-devel
+Requires: jpackage-utils
 Requires: glite-ce-monitor
 BuildRoot: %{_builddir}/%{name}-root
 AutoReqProv: yes
 Source: glite-ce-osg-ce-plugin-1.13.1-3.src.tar.gz
+Patch0: build.xml.patch
 
 %description
 The plugin is a sensor for the CE monitor service that accesses the Open Science Grid information system
@@ -22,8 +27,11 @@ The plugin is a sensor for the CE monitor service that accesses the Open Science
  
 
 %setup  
+%patch0 -p0
 
 %build
+# should be %{java_home}, but that points to 1.6.0 in el6
+export JAVA_HOME=/usr/lib/jvm/java-1.7.0
 printf "stage.location=/usr
 dist.location=$RPM_BUILD_ROOT/usr
 org.glite.ce.commonj.location=/usr
@@ -34,6 +42,7 @@ module.version=1.13.1">.configuration.properties;
   
 
 %install
+export JAVA_HOME=/usr/lib/jvm/java-1.7.0
 rm -rf $RPM_BUILD_ROOT
  mkdir -p $RPM_BUILD_ROOT
  ant install
@@ -59,6 +68,11 @@ usermod -a -G gip tomcat
 /usr/share/doc/glite-ce-osg-ce-plugin-1.13.1/LICENSE
 
 %changelog
+* Fri Feb 02 2013 Carl Edquist <edquist@cs.wisc.edu> - 1.13.1-5
+- Updates to build with JDK 7; require java7-devel + jpackage-utils
+- Explicitly set JAVA_HOME since it points to 1.6.0 in el6
+- Patch build.xml to fix warning
+
 * Mon Mar 12 2012 Doug Strain <dstrain@fnal.gov> 
 - SOFTWARE-570: CEMon OSG plugin tomcat user should be in gip group
 - Fixes writing problems to /var/log/gip and /var/cache/gip
