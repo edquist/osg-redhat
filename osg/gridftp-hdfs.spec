@@ -9,7 +9,7 @@
 
 Name:           gridftp-hdfs
 Version:        0.5.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        HDFS DSI plugin for GridFTP
 Group:          System Environment/Daemons
 License:        ASL 2.0
@@ -26,13 +26,8 @@ Patch0: lcmaps15.patch
 Patch1: hadoop200.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-# On SL6, build fails since java-devel pulls in java-1.5.0-gcj
-#  which has libjvm in /usr/lib64/gcj-4.4.0 and gcc can't find it.
-%if 0%{rhel} == 6
-BuildRequires: jdk java-1.6.0-sun-compat
-%else
-BuildRequires: java-devel
-%endif
+BuildRequires: java7-devel
+BuildRequires: jpackage-utils
 
 BuildRequires: hadoop-libhdfs
 BuildRequires: globus-gridftp-server-devel
@@ -41,6 +36,8 @@ BuildRequires: globus-common-devel
 Requires: hadoop-libhdfs
 Requires: globus-gridftp-server-progs
 Requires: xinetd
+Requires: java7
+Requires: jpackage-utils
 
 Requires(pre): shadow-utils
 Requires(preun): initscripts
@@ -133,6 +130,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 02 2013 Carl Edquist <edquist@cs.wisc.edu> - 0.5.4-6
+- Update to build with OpenJDK 7; require java7-devel + jpackage-utils
+
 * Wed Jan 23 2013 Doug Strain <dstrain@fnal.gov> - 0.5.4-5
 - Rebuild for Gridftp 6.14
 
