@@ -4,16 +4,17 @@
 Summary: The VOMS Administration service
 Name: voms-admin-server
 Version: 2.7.0
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 License:    ASL 2.0
 Group: System Environment/Libraries
 BuildRequires:  maven22
 BuildRequires:  jpackage-utils
-BuildRequires:  java-devel-sun
+BuildRequires:  java7-devel
 BuildRequires:  emi-trustmanager
 BuildRequires:  emi-trustmanager-axis
 
-Requires: java-sun
+Requires: jpackage-utils
+Requires: java7-devel
 Requires: emi-trustmanager
 Requires: emi-trustmanager-tomcat
 Requires: bouncycastle >= 1.39
@@ -145,6 +146,9 @@ fi
 %{tomcat_endorsed}/xalan-j2-serializer.jar
 
 %changelog
+* Tue Feb 26 2013 Carl Edquist <edquist@cs.wisc.edu> - 2.7.0-1.3
+- Updates to build with OpenJDK 7; require java7-devel + jpackage-utils
+
 * Tue Aug 28 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 2.7.0-1.2
 Add symlinks for xalan-j2 to tomcat endorsed dir
 Fix CATALINA_HOME in sysconfig file
