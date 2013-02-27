@@ -14,7 +14,7 @@
 
 Name:           bestman2
 Version:        2.3.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        SRM server for Grid Storage Elements
 
 Group:          System Environment/Daemons
@@ -45,7 +45,7 @@ Source10:       bestman2lib.sysconfig
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 
-BuildRequires:  java-1.6.0-sun-compat wget ant axis jakarta-commons-logging jakarta-commons-discovery wsdl4j jakarta-commons-collections jakarta-commons-lang joda-time velocity xalan-j2 xml-security bouncycastle voms-api-java >= 2.0.8 slf4j log4j cog-jglobus-axis jglobus autoconf
+BuildRequires:  java7-devel jpackage-utils wget ant axis jakarta-commons-logging jakarta-commons-discovery wsdl4j jakarta-commons-collections jakarta-commons-lang joda-time velocity xalan-j2 xml-security bouncycastle voms-api-java >= 2.0.8 slf4j log4j cog-jglobus-axis jglobus autoconf
 BuildRequires: jetty-client jetty-continuation jetty-deploy jetty-http jetty-io jetty-security jetty-server jetty-servlet jetty-util jetty-webapp jetty-xml
 BuildRequires: emi-trustmanager emi-trustmanager-axis
 BuildRequires: gums
@@ -78,7 +78,7 @@ through Lawrence Berkeley National Laboratory.  See LICENSE file for details.
 %package common-libs
 Summary: Common files BeStMan SRM server client and tester
 Group: System Environment/Libraries
-Requires:  java axis jakarta-commons-logging jakarta-commons-discovery wsdl4j log4j jglobus cog-jglobus-axis
+Requires:  java7 jpackage-utils axis jakarta-commons-logging jakarta-commons-discovery wsdl4j log4j jglobus cog-jglobus-axis
 # The following are needed for srm client tools and probably tester too
 Requires:  joda-time glite-security-trustmanager glite-security-util-java xalan-j2 voms-api-java >= 2.0.8 jakarta-commons-collections
 %description common-libs
@@ -91,7 +91,8 @@ It also contains the license, readme, and property files
 Summary: BeStMan SRM server
 Group: System Environment/Daemons
 Obsoletes: bestman2
-Requires: java-1.6.0-sun-compat
+Requires: java7-devel
+Requires: jpackage-utils
 Requires: %{name}-common-libs = %{version}-%{release}
 Requires: %{name}-server-libs = %{version}-%{release}
 Requires: %{name}-server-dep-libs = %{version}-%{release}
@@ -107,14 +108,15 @@ BeStMan SRM server
 %package server-libs
 Summary: BeStMan Server SRM Java libraries
 Group: System Environment/Libraries
-Requires: java-1.6.0-sun-compat
+Requires: java7-devel
+Requires: jpackage-utils
 %description server-libs
 The BeStMan Server SRM Java libraries
 
 %package server-dep-libs
 Summary: BeStMan Server SRM Java libraries
 Group: System Environment/Libraries
-Requires: java-1.6.0-sun-compat jakarta-commons-lang joda-time emi-trustmanager emi-trustmanager-axis xalan-j2 voms-api-java >= 2.0.8 jakarta-commons-collections
+Requires: java7-devel jpackage-utils jakarta-commons-lang joda-time emi-trustmanager emi-trustmanager-axis xalan-j2 voms-api-java >= 2.0.8 jakarta-commons-collections
 Requires: jetty-client jetty-continuation jetty-deploy jetty-http jetty-io jetty-security jetty-server jetty-servlet jetty-util jetty-webapp jetty-xml
 Requires: gums
 
@@ -135,14 +137,16 @@ The srm-* client tools
 %package client-libs
 Summary: Libraries needed for Bestman LBNL SRM client
 Group: System Environment/Libraries
-Requires:  java-1.6.0-sun-compat
+Requires:  java7-devel
+Requires:  jpackage-utils
 %description client-libs
 These are the libraries needed solely for the client 
 
 %package tester
 Summary: srmtester application for verifying a SRM endpoint
 Group: Applications/Internet
-Requires:  java-1.6.0-sun-compat
+Requires:  java7-devel
+Requires:  jpackage-utils
 Requires: %{name}-tester-libs = %{version}-%{release}
 Requires: %{name}-common-libs = %{version}-%{release}
 Requires: %{name}-client-libs = %{version}-%{release}
@@ -155,7 +159,8 @@ of the SRM protocol are functioning on an SRM endpoint.
 %package tester-libs
 Summary: Libraries needed for Bestman LBNL SRM client
 Group: System Environment/Libraries
-Requires:  java-1.6.0-sun-compat
+Requires:  java7-devel
+Requires:  jpackage-utils
 %description tester-libs
 These are the libraries needed solely for the srmtester application 
 
@@ -428,6 +433,9 @@ fi
 
 
 %changelog
+* Tue Feb 26 2013 Carl Edquist <edquist@cs.wisc.edu> - 2.3.0-10
+- Updates to build with OpenJDK 7; require java7-devel + jpackage-utils
+
 * Thu Jan 10 2013 Neha Sharma <neha@fnal.gov> - 2.3.0-9
 - modify the init script to cd in to /tmp to void build-classpath issue on SL5
 
