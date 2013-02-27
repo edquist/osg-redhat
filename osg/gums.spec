@@ -7,7 +7,7 @@
 Name: gums
 Summary: Grid User Management System.  Authz for grid sites
 Version: 1.3.18.009
-Release: 15.3%{?dist}
+Release: 15.4%{?dist}
 License: Unknown
 Group: System Environment/Daemons
 %if 0%{?rhel} < 6
@@ -22,15 +22,14 @@ BuildRequires: maven2
 #This is probably not right, but one thing at a time
 %define jacc %{nil}
 BuildRequires: maven22
-BuildRequires: jdk
 ## explicitly requiring this because I don't want yum to pick java-1.5.0-gcj-devel
-BuildRequires: java-1.6.0-sun-compat
 %endif
-BuildRequires: java-devel
+BuildRequires: java7-devel
 BuildRequires: jglobus
 # provides build-classpath
 BuildRequires: jpackage-utils 
-Requires: java
+Requires: java7
+Requires: jpackage-utils 
 Requires: jglobus
 #BuildRequires: voms-api-java
 #Requires: voms-api-java
@@ -360,6 +359,9 @@ if [ $1 -eq 0 ]; then
 fi
 
 %changelog
+* Tue Feb 26 2013 Carl Edquist <edquist@cs.wisc.edu> - 1.3.18.009-15.4
+- Updates to build with OpenJDK 7; require java7-devel and jpackage-utils
+
 * Tue Jan 29 2013 Doug Strain <dstrain@fnal.gov> - 1.3.18.009-15.3
 - Fix for directory location of gums client log files
 
