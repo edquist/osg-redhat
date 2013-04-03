@@ -1,7 +1,7 @@
 Name:      osg-wn-client
 Summary:   OSG Worker-Node Client
 Version:   3.0.0
-Release:   18%{?dist}
+Release:   19%{?dist}
 License:   Apache 2.0
 Group:     Grid
 URL:       http://www.opensciencegrid.org
@@ -9,7 +9,7 @@ BuildArch: noarch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
-Requires: java-1.6.0-sun-compat
+Requires: java7-devel # included because users expect java to be available
 Requires: /usr/bin/curl
 Requires: /usr/bin/dccp
 Requires: dcap-tunnel-gsi
@@ -91,6 +91,9 @@ rm -rf $RPM_BUILD_ROOT
 %files glexec
 
 %changelog
+* Wed Apr 03 2013 Brian Lin <blin@cs.wisc.edu> - 3.0.0-19.osg
+- Update to require java7-devel
+
 * Fri Feb 22 2013 Brian Lin <blin@cs.wisc.edu> - 3.0.0-18.osg
 - Update rhel5 to require fetch-crl3 instead of fetch-crl.
 
