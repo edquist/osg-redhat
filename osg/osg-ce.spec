@@ -1,7 +1,7 @@
 Name:      osg-ce
 Summary:   OSG Compute Element 
 Version:   3.0.0
-Release:   30%{?dist}
+Release:   31%{?dist}
 License:   Apache 2.0
 Group:     Grid
 URL:       http://www.opensciencegrid.org
@@ -10,7 +10,6 @@ BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 Requires: osg-version
 Requires: grid-certificates
-Requires: java-1.6.0-sun-compat
 Requires: globus-gridftp-server-progs 
 Requires: osg-client
 Requires: lfc-client
@@ -120,6 +119,9 @@ rm -rf $RPM_BUILD_ROOT
 %files sge
 
 %changelog
+* Wed Apr 03 2013 Brian Lin <blin@cs.wisc.edu> - 3.0.0-31
+- Update to remove java requirement since it's brought in by osg-client -> osg-wn-client
+
 * Fri Apr 13 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0.0-30
 - Restored gums dependency on el6.
 
