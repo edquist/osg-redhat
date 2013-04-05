@@ -1,7 +1,7 @@
 
 Name: xrootd-hdfs
 Version: 1.8.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: HDFS plugin for xrootd
 
 Group: System Environment/Development
@@ -15,6 +15,8 @@ BuildRequires: xrootd-devel
 BuildRequires: xrootd-server-devel
 BuildRequires: cmake
 BuildRequires: hadoop-0.20-libhdfs >= 0.20.2+737-4
+BuildRequires: java7-devel
+BuildRequires: jpackage-utils
 Conflicts: xrootd < 3.0.3-1
 
 %package devel
@@ -68,6 +70,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/XrdHdfs.hh
 
 %changelog
+* Thu Apr 04 2013 Carl Edquist <edquist@cs.wisc.edu> - 1.8.3-5
+- Rebuild for updated build dependency (hadoop-0.20),
+- Explicitly add java7-devel build requirement
+
 * Wed Apr 03 2013 Matyas Selmeci <matyas@cs.wisc.edu> - 1.8.3-4
 - Bump to rebuild against xrootd 3.3.1
 - Rename xrootd-libs-devel dependency to match what 3.3.1 calls it
