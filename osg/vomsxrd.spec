@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 # Package definitions
 #-------------------------------------------------------------------------------
-Name:      vomsxrd
+Name:      xrootd-voms-plugin
 Epoch:     1
 Version:   0.2.0
 Release:   1.1%{?dist}
@@ -43,10 +43,10 @@ Headers for using the VOMS attribute extractor plug-in
 # Build instructions
 #-------------------------------------------------------------------------------
 %prep
-%setup -c -n %{name}
+%setup -c -n vomsxrd
 
 %build
-cd %{name}
+cd vomsxrd
 mkdir build
 cd build
 
@@ -58,7 +58,7 @@ make VERBOSE=1 %{?_smp_mflags}
 # Installation
 #-------------------------------------------------------------------------------
 %install
-cd %{name}
+cd vomsxrd
 cd build
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
@@ -87,7 +87,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(-,root,root,-)
-%{_includedir}/%{name}
+%{_includedir}/vomsxrd
 
 #-------------------------------------------------------------------------------
 # Changelog
@@ -96,6 +96,7 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Apr 22 2013 Matyas Selmeci <matyas@cs.wisc.edu> - 1:0.2.0-1.1
 - Rebuild for OSG
 - Fix epoch and version on xrootd dependencies
+- Rename to xrootd-voms-plugin
 
 * Wed Mar 21 2013 G. Ganis <gerardo.ganis@cern.ch>
 - Created
