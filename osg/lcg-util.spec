@@ -21,7 +21,7 @@
 
 
 Name:						lcg-util
-Version:					1.14.0
+Version:					1.15.0
 Release:					0.1%{?dist}
 Summary:					Command line tools for wlcg storage system 
 Group:						Applications/Internet
@@ -219,14 +219,18 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Jan 8 2013 Doug Strain <dstrain@fnal.gov> - 1.14.0-0.1
-- Rebuild of 1.14.0 for OSG
+* Thu Jul 25 2013 Matyas Selmeci <matyas@cs.wisc.edu> - 1.15.0-0.1
+- Merged OSG changes
+
+* Wed Mar 20 2013 Adrien Devresse <adevress at cern.ch> - 1.15.0-0
+ - EMI lcg-util 1.15.0 release
+ - contain several bugfix related to srm-ifce and gfal 1.0
 
 * Thu Nov 29 2012 Adrien Devresse <adevress at cern.ch> - 1.14.0-0
  - several bug fixs from gfal 1.0, srm-ifce and is-interface
  - see respective changelog for details
 
-* Tue Oct 15 2012 Doug Strain <dstrain@fnal.gov> - 1.13.9-4
+* Tue Oct 15 2012 Doug Strain <dstrain@fnal.gov> - 1.13.9-4.osg
 - Repackaged for OSG
 - Added obsoletes for OSG lcg-utils
 - Added dependency for globus-common-progs for globus-version
@@ -235,7 +239,6 @@ rm -rf %{buildroot}
  - apply a fix in order to resolve gfal 32bits vs 64 bits conflict
  - resolve a problem whith automatic LFC_HOST resolution and is-interface, 
  - fix a problem related to the send and received timeout, GGUS 86202
-
 
 * Fri Jul 20 2012 Adrien Devresse <adevress at cern.ch> - 1.13.0-0
  - gfal 1.0 32 bits problem correction (gfal)
