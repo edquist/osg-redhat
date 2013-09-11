@@ -1,4 +1,4 @@
-Name:           osg-release
+Name:           osg-release-itb
 Version:        3.0
 Release:        22%{?dist}
 Summary:        OSG Software for Enterprise Linux repository configuration
@@ -90,74 +90,5 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Feb 07 2013 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-22
-- Add *upcoming* repos
-
-* Thu Apr 26 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-21
-- Changing Requires back to redhat-release > [5|6]
-
-* Thu Apr 26 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-20
-- Fixing el5 and el6 requires
-
-* Thu Apr 26 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-19
-- Changing requires so only el5 on el5, el6 on el6
-
-* Tue Apr 10 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-18
-- Also fixed baseurl entries in the el5 repo files
-
-* Mon Apr 09 2012 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-17
-- Fixed baseurl entries in the el6 repo files
-
-* Thu Feb 16 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-16
-- Turning off el6 minefield
-
-* Mon Feb 13 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-15
-- Fixing sources for el5 version of osg-release
-
-* Tue Jan 31 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-14
-- Changing mirror urls for el6
-
-* Thu Jan 19 2012 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-13
-- Adding preliminary el6 support
-
-* Mon Nov 28 2011 Neha Sharma <neha@fnal.gov> - 3.0-12
-- Added consider_as_osg=yes to all osg repo files
-
-* Mon Nov 14 2011 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-11
-- Added osg-prerelease repo
-
-* Fri Sep 23 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 3.0-10
-- Previous improvements to debug and source repos were previously not applied to the contrib repo.
-
-* Mon Sep 19 2011 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-9
-- Added commented-out baseurl line to the .repo files so people have a fallback
-  if there is a problem with the mirrors
-- Added -debug repositories (disabled by default) for the debuginfo packages
-  for development, testing, and release.
-
-* Fri Sep 16 2011 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-8
-- Added RPM signing public key
-- Changed all repo files to require gpg check
-
-* Fri Sep 09 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 3.0-7
-- Add in stub for the osg-contrib repository.
-
-* Fri Sep 2 2011 Matyas Selmeci <matyas@cs.wisc.edu> - 3.0-6
-- Files changed to point to GOC repos
-- Removed conflict with fedora-release
-
-* Mon Aug 15 2011 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-5
-- Corrected the source repos
-
-* Thu Aug 11 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 3.0-4
-- Added minefield repository, which reads directly from Koji.
-
-* Thu Aug 04 2011 Brian Bockelman <bbockelm@cse.unl.edu> - 3.0-3
-- Rename from VDT-* to OSG-*.
-
-* Mon Jul 18 2011 Derek Weitzel <dweitzel@cse.unl.edu> - 3.0-2
-- Changed vdt-development so that it doesn't force gpg checks
-
-* Wed Jul 06 2011 Derek Weitzel <dweitzel@cse.unl.edu> - 3-1
-- Adapted EPEL release rpm for use with the VDT
-
+* Wed Sep 11 2013 Brian Lin <blin@cs.wisc.edu> - 3.0-22
+- Create osg-release-itb
