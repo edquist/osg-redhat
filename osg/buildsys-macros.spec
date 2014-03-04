@@ -1,9 +1,8 @@
 %define dver %{?rhel}%{?!rhel:5}
-%define osgver int
 Name:		buildsys-macros
-Summary:	Macros for the OSG Buildsystem
+Summary:	Macros for the Condor team's usage of the OSG Koji instance
 Version:        7
-Release:	4%{?dist}
+Release:	6%{?dist}
 License:	GPL
 Group:		Development/Buildsystem
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -11,7 +10,7 @@ BuildArch:      noarch
 Requires:	rpmdevtools
 
 %description
-Macros for the OSG Buildsystem
+%{summary}
 
 %prep
 
@@ -21,11 +20,10 @@ Macros for the OSG Buildsystem
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc/rpm/
 DVER=%{dver}
-OSGVER=%{osgver}
 printf %s%b "%" "rhel $DVER\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
-printf %s%b "%" "dist .osg$OSGVER.el$DVER\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
+printf %s%b "%" "dist .el$DVER\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
 printf %s%b "%" "el$DVER 1\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
-printf %s%b "%" "osg 1\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
+printf %s%b "%" "uw_build 1\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.disttag
 printf %s%b "%" "__arch_install_post /usr/lib/rpm/check-buildroot\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.checkbuild
 if [[ $DVER -eq 5 ]]; then
     printf %s%b "%" "_source_filedigest_algorithm 1\n" >> $RPM_BUILD_ROOT/etc/rpm/macros.digest
@@ -48,6 +46,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/rpm/macros.checkbuild
 
 %changelog
+* Mon Mar 03 2014 Mátyás Selmeci <matyas@cs.wisc.edu> 7-6
+- Bump to rebuild with buildsys-macros 7-5
+* Mon Mar 03 2014 Mátyás Selmeci <matyas@cs.wisc.edu> 7-5
+- Create condor version of buildsys-macros
+
 * Wed Dec 11 2013 Carl Edquist <edquist@cs.wisc.edu> - 7-4
 - Bump to rebuild with buildsys-macros 7-3
 
