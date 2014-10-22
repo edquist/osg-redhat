@@ -118,7 +118,7 @@ Version: %{tarball_version}
 
 # Only edit the %condor_base_release to bump the rev number
 %define condor_git_base_release 0.1
-%define condor_base_release 1.2
+%define condor_base_release 1.3
 %if %git_build
         %define condor_release %condor_git_base_release.%{git_rev}.git
 %else
@@ -586,6 +586,14 @@ Summary: Python bindings for HTCondor.
 Group: Applications/System
 Requires: python >= 2.2
 Requires: %name = %version-%release
+
+%if 0%{?rhel} >= 7
+# The auto provides generator does not pick these up in EL7 for some reason
+# bitness should be either '(32bit)' or '(64bit)'
+%define bitness %{?__isa_bits:(%{__isa_bits}bit)}
+Provides: classad.so()%{?bitness}
+Provides: htcondor.so()%{?bitness}
+%endif
 
 %description python
 The python bindings allow one to directly invoke the C++ implementations of
@@ -1749,6 +1757,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 22 2014 Mátyás Selmeci <matyas@cs.wisc.edu> - 8.2.3-1.3
+- Add missing library provides for condor-python on EL7
+
 * Wed Oct 01 2014 Carl Edquist <edquist@cs.wisc.edu> - 8.2.3-1.1
 - Include patches from 8.3.2 for #4556 and #4590
 
