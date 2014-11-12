@@ -1,7 +1,11 @@
+%if ! 0%{?el7}
+%{warn:"*** THIS BUILD IS FOR EL7 ONLY ***"}
+%endif
+
 Summary: Security utilities
 Name: emi-trustmanager
 Version: 3.0.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: EMI
 Vendor: EMI
 Group: System Environment/Libraries
@@ -10,32 +14,45 @@ BuildArch: noarch
 BuildRequires: ant
 BuildRequires: bouncycastle
 BuildRequires: log4j
-BuildRequires: java7-devel
-BuildRequires: jpackage-utils
-Requires: java7
+Requires: java-headless >= 1:1.7.0
 Requires: jpackage-utils
-# ensure these are present, from jpackage-utils or missing-java-1.7.0-dirs
-Requires: /usr/lib/java-1.7.0
-Requires: /usr/share/java-1.7.0
 BuildRoot: %{_builddir}/%{name}-root
-AutoReqProv: yes
 Source: emi-trustmanager-3.0.3-1.src.tar.gz
 Patch0: incorrect_oid.patch
 Patch1: build.xml.patch
 Patch2: better_log.patch
 Patch3: X509Name_cast.patch
+Patch10: bc1.47+-ASN1Object.patch
+Patch11: bc1.47+-ASN1Encodable.patch
+Patch12: bc1.47+-DEREncodable.patch
+Patch13: bc1.47+-DERObjectIdentifier.patch
+Patch14: bc1.47+-DERObject.patch
+Patch15: bc1.47+-getDERObject.patch
+Patch16: bc1.47+-DERInteger.patch
+Patch17: bc1.47+-getDEREncoded.patch
+
 
 %description
 The java authentication and proxy generation implementation that supports grid proxies.
 
 %prep
 
-%setup  
+%setup
 
-%patch0 -p0 
+%patch0 -p0
 %patch1 -p0
 %patch2 -p0
 %patch3 -p0
+# bouncycastle patches
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+%patch14 -p1
+%patch15 -p1
+%patch16 -p1
+%patch17 -p1
+
 
 %build
  
@@ -222,6 +239,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/doc/trustmanager/html/index-all.html
 
 %changelog
+* Tue Nov 11 2014 Mátyás Selmeci <matyas@cs.wisc.edu> 3.0.3-7
+- Build with bouncycastle 1.50 and patch API breakage
+
 * Wed Oct 29 2014 Brian Bockelman <bbockelm@cse.unl.edu> - 3.0.3-6
 - Fix issues with newer bcprov.
 
