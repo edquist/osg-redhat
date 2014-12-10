@@ -1,7 +1,7 @@
 %define hadoop_version 2.0.0+545
 %define hadoop_patched_version 2.0.0-cdh4.1.1
 %define hadoop_base_version 2.0.0
-%define hadoop_release 1.cdh4.1.1.p0.20%{?dist}
+%define hadoop_release 1.cdh4.1.1.p0.21%{?dist}
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -183,7 +183,12 @@ Patch6: 1184-extendable-client.patch
 Patch7: HDFS-5341.004.patch
 
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id} -u -n)
-BuildRequires: python >= 2.4, git, fuse-devel,fuse, automake, autoconf,maven3,protobuf-compiler, cmake
+BuildRequires: python >= 2.4, git, fuse-devel,fuse, automake, autoconf, protobuf-compiler, cmake
+%if 0%{?rhel} >= 7
+BuildRequires: maven >= 3
+%else
+BuildRequires: maven3
+%endif
 BuildRequires: java7-devel
 BuildRequires: jpackage-utils
 BuildRequires: /usr/lib/java-1.7.0
@@ -873,6 +878,9 @@ fi
 
 
 %changelog
+* Wed Oct 08 2014 Mátyás Selmeci <matyas@cs.wisc.edu> 2.0.0+545-1.cdh4.1.1.p0.21
+- Spec file changes to build for EL7
+
 * Thu Apr 10 2014 Edgar Fajardo <efajardo@physics.ucsd.edu> - 2.0.0+545-1.cdh4.1.1.p0.20
 - Adding a patch for large datanodes time out during block reports
 -- Credit to Erik Gough for providing the patch
