@@ -10,8 +10,8 @@ Name:           glideinwms
 #%define release 1
 
 %if %{v2_plus}
-%define version 2.7.1
-%define release 1.1
+%define version 2.7.2
+%define release 1
 %define frontend_xml frontend.xml
 %define factory_xml glideinWMS.xml
 %endif
@@ -20,7 +20,7 @@ Name:           glideinwms
 # For Release Candidate builds, check with Software team on release string
 # ------------------------------------------------------------------------------
 %if %{v3_plus}
-%define version 3.2.2
+%define version 3.2.10
 %define release 1
 %define frontend_xml frontend.master.xml
 %define factory_xml glideinWMS.master.xml
@@ -55,12 +55,12 @@ Source:	glideinwms.tar.gz
 # git archive v3_0_rc3 --prefix='glideinwms/' | gzip > ../glideinwms.tar.gz
 # change v3_0_rc3 to the proper tag in the above line
 
-Source1:        frontend_startup
+Source1:        creation/templates/frontend_startup
 Source2:        %{frontend_xml}
 Source3:        gwms-frontend.conf.httpd
 Source4:	%{factory_xml}
 Source5:        gwms-factory.conf.httpd
-Source6:        factory_startup
+Source6:        creation/templates/factory_startup
 Source7:	chksum.sh
 Source8:        gwms-frontend.sysconfig
 Source9:        gwms-factory.sysconfig
@@ -96,12 +96,13 @@ This package is for a one-node vofrontend install
 Summary:        The VOFrontend for glideinWMS submission host
 Group:          System Environment/Daemons
 Requires: httpd
-# We require Condor 7.6.0 (and newer) to support
-# condor_advertise -multiple -tcp which is enabled by default
-Requires: condor >= 7.8.0
+# Most functions work with HTCondor 7.8.0 (and newer) 
+# gangliad enabled by default requires 8.2 - disable it if you have an older condor
+# 8.2.2 should be avoided because incompatible with 8.0
+Requires: condor >= 8.2.3
 Requires: python-rrdtool
 Requires: m2crypto
-Requires: javascriptrrd
+Requires: javascriptrrd >= 1.1.0
 Requires: osg-client
 Requires: glideinwms-minimal-condor = %{version}-%{release}
 Requires: glideinwms-libs = %{version}-%{release}
@@ -127,7 +128,7 @@ Requires: condor >= 7.8.0
 Requires: glideinwms-minimal-condor = %{version}-%{release}
 Requires: glideinwms-glidecondor-tools = %{version}-%{release}
 %description usercollector
-The user collector matches user jobs to glideins in the user pool.
+The user collector matches user jobs to glideins in the WMS pool.
 It can be split off into its own node.
 
 
@@ -145,6 +146,7 @@ This is a package for a glideinwms submit host.
 Summary:        The glideinWMS common libraries.
 Group:          System Environment/Daemons
 Requires: python-rrdtool
+Requires: python-ldap
 Requires: m2crypto
 %description libs
 This is a package provides common libraries used by glideinwms.
@@ -164,7 +166,7 @@ Group:          System Environment/Daemons
 Provides: gwms-condor-config
 %description minimal-condor
 This is an alternate condor config for just the minimal amount
-needed for vofrontend.
+needed for VOFrontend.
 
 
 %package factory
@@ -177,8 +179,9 @@ Requires: httpd
 Requires: glideinwms-factory-condor = %{version}-%{release}
 Requires: condor >= 7.8.0
 Requires: python-rrdtool
+Requires: python-ldap
 Requires: m2crypto
-Requires: javascriptrrd
+Requires: javascriptrrd >= 1.1.0
 Requires(post): /sbin/service
 Requires(post): /usr/sbin/useradd
 Requires(post): /sbin/chkconfig
@@ -186,12 +189,12 @@ Requires(post): /sbin/chkconfig
 The purpose of the glideinWMS is to provide a simple way
 to access the Grid resources. GlideinWMS is a Glidein
 Based WMS (Workload Management System) that works on top of
-Condor. For those familiar with the Condor system, it is used
+HTCondor. For those familiar with the Condor system, it is used
 for scheduling and job control.
 
 
 %package factory-condor
-Summary:        The VOFrontend condor config
+Summary:        The GWMS Factory condor config
 Group:          System Environment/Daemons
 Provides: gwms-factory-config
 %description factory-condor
@@ -212,8 +215,8 @@ install of wmscollector + wms factory
 %build
 cp %{SOURCE7} .
 chmod 700 chksum.sh
-./chksum.sh v%{version}-%{release}.osg etc/checksum.frontend "CVS config_examples doc .git .gitattributes poolwatcher factory/check* factory/glideFactory* factory/test* factory/manage* factory/stop* factory/tools creation/create_glidein creation/reconfig_glidein creation/info_glidein creation/lib/cgW* creation/web_base/factory*html creation/web_base/collector_setup.sh creation/web_base/condor_platform_select.sh creation/web_base/condor_startup.sh creation/web_base/create_mapfile.sh creation/web_base/gcb_setup.sh creation/web_base/glexec_setup.sh creation/web_base/glidein_startup.sh creation/web_base/job_submit.sh creation/web_base/local_start.sh creation/web_base/setup_x509.sh creation/web_base/update_proxy.py creation/web_base/validate_node.sh chksum.sh etc/checksum*"
-./chksum.sh v%{version}-%{release}.osg etc/checksum.factory "CVS config_examples doc .git .gitattributes poolwatcher frontend/* creation/reconfig_glidein creation/lib/cgW* creation/web_base/factory*html creation/web_base/collector_setup.sh creation/web_base/condor_platform_select.sh creation/web_base/condor_startup.sh creation/web_base/create_mapfile.sh creation/web_base/gcb_setup.sh creation/web_base/glexec_setup.sh creation/web_base/glidein_startup.sh creation/web_base/job_submit.sh creation/web_base/local_start.sh creation/web_base/setup_x509.sh creation/web_base/update_proxy.py creation/web_base/validate_node.sh chksum.sh etc/checksum*"
+./chksum.sh v%{version}-%{release}.osg etc/checksum.frontend "CVS config_examples doc .git .gitattributes poolwatcher factory/check* factory/glideFactory* factory/test* factory/manage* factory/stop* factory/tools creation/create_glidein creation/reconfig_glidein creation/info_glidein creation/lib/cgW* creation/web_base/factory*html creation/web_base/collector_setup.sh creation/web_base/condor_platform_select.sh creation/web_base/condor_startup.sh creation/web_base/create_mapfile.sh creation/web_base/gcb_setup.sh creation/web_base/glexec_setup.sh creation/web_base/glidein_startup.sh creation/web_base/job_submit.sh creation/web_base/local_start.sh creation/web_base/setup_x509.sh creation/web_base/update_proxy.py creation/web_base/validate_node.sh chksum.sh etc/checksum* unittests"
+./chksum.sh v%{version}-%{release}.osg etc/checksum.factory "CVS config_examples doc .git .gitattributes poolwatcher frontend/* creation/reconfig_glidein creation/clone_glidein creation/lib/cgW* creation/web_base/factory*html creation/web_base/collector_setup.sh creation/web_base/condor_platform_select.sh creation/web_base/condor_startup.sh creation/web_base/create_mapfile.sh creation/web_base/gcb_setup.sh creation/web_base/glexec_setup.sh creation/web_base/glidein_startup.sh creation/web_base/job_submit.sh creation/web_base/local_start.sh creation/web_base/setup_x509.sh creation/web_base/update_proxy.py creation/web_base/validate_node.sh chksum.sh etc/checksum* unittests"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -233,6 +236,10 @@ sed -i "s/WEB_BASE_DIR=.*/WEB_BASE_DIR=\"\/var\/lib\/gwms-frontend\/web-base\"/"
 sed -i "s/STARTUP_DIR=.*/STARTUP_DIR=\"\/var\/lib\/gwms-frontend\/web-base\"/" creation/reconfig_frontend
 sed -i "s/WEB_BASE_DIR=.*/WEB_BASE_DIR=\"\/var\/lib\/gwms-factory\/web-base\"/" creation/reconfig_glidein
 sed -i "s/STARTUP_DIR =.*/STARTUP_DIR=\"\/var\/lib\/gwms-factory\/web-base\"/" creation/reconfig_glidein
+sed -i "s/STARTUP_DIR =.*/STARTUP_DIR=\"\/var\/lib\/gwms-factory\/web-base\"/" creation/clone_glidein
+
+#Create the RPM startup files (init.d) from the templates
+creation/create_rpm_startup . %{SOURCE1} %{SOURCE6}
 
 # install the executables
 install -d $RPM_BUILD_ROOT%{_sbindir}
@@ -251,6 +258,7 @@ install -m 0500 factory/glideFactoryEntryGroup.py $RPM_BUILD_ROOT%{_sbindir}/
 install -m 0500 factory/manageFactoryDowntimes.py $RPM_BUILD_ROOT%{_sbindir}/
 install -m 0500 factory/stopFactory.py $RPM_BUILD_ROOT%{_sbindir}/
 install -m 0500 creation/reconfig_glidein $RPM_BUILD_ROOT%{_sbindir}/
+install -m 0500 creation/clone_glidein $RPM_BUILD_ROOT%{_sbindir}/
 install -m 0500 creation/info_glidein $RPM_BUILD_ROOT%{_sbindir}/
 
 
@@ -263,6 +271,7 @@ rm -Rf $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/install
 rm -Rf $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/doc
 rm -Rf $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/etc
 rm -Rf $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/creation/config_examples
+rm -f $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/creation/create_rpm_startup
 rm -f $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/.gitattributes
 rm -Rf $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/unittests
 rm -f $RPM_BUILD_ROOT%{python_sitelib}/glideinwms/chksum.sh
@@ -361,28 +370,23 @@ rm -rf $RPM_BUILD_ROOT%{web_base}/CVS
 
 # Install condor stuff
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/condor/ganglia.d
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/condor/certs
 #make sure this (new) file exists, can be deprecated in gwms 2.7 or so
 touch install/templates/90_gwms_dns.config
-install -m 0644 install/templates/00_gwms_general.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/00_gwms_factory_general.config
+install -m 0644 install/templates/00_gwms_factory_general.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
 install -m 0644 install/templates/00_gwms_general.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
-install -m 0644 install/templates/01_gwms_collectors.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
+install -m 0644 install/templates/01_gwms_factory_collectors.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
 install -m 0644 install/templates/01_gwms_collectors.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
+install -m 0644 install/templates/01_gwms_ganglia.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
 install -m 0644 install/templates/02_gwms_factory_schedds.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
 install -m 0644 install/templates/02_gwms_schedds.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
-install -m 0644 install/templates/03_gwms_local.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/03_gwms_factory_local.config
 install -m 0644 install/templates/03_gwms_local.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
-install -m 0644 install/templates/11_gwms_secondary_collectors.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/11_gwms_factory_secondary_collectors.config
 install -m 0644 install/templates/11_gwms_secondary_collectors.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
 install -m 0644 install/templates/90_gwms_dns.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/
+install -m 0644 install/templates/01_gwms_metrics.config $RPM_BUILD_ROOT%{_sysconfdir}/condor/ganglia.d/
 install -m 0644 install/templates/condor_mapfile $RPM_BUILD_ROOT%{_sysconfdir}/condor/certs/
 install -m 0644 install/templates/privsep_config $RPM_BUILD_ROOT%{_sysconfdir}/condor/
-
-sed -i "s/^COLLECTOR_NAME = .*$/COLLECTOR_NAME = wmscollector_service/" $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
-sed -i "s/^DAEMON_LIST.*=.*$//" $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
-sed -i 's/^COLLECTOR[0-9]*.\\//' $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
-echo 'DAEMON_LIST   = $(DAEMON_LIST),  COLLECTOR, NEGOTIATOR' >> $RPM_BUILD_ROOT%{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
-
 
 #Install condor schedd dirs
 for schedd in "schedd_glideins2" "schedd_glideins3" "schedd_glideins4" "schedd_glideins5" "schedd_jobs2"; do
@@ -442,6 +446,12 @@ frontend_name=`echo $fqdn_hostname | sed 's/\./-/g'`_OSG_gWMSFrontend
 sed -i "s/FRONTEND_NAME_CHANGEME/$frontend_name/g" %{_sysconfdir}/gwms-frontend/frontend.xml
 sed -i "s/FRONTEND_HOSTNAME/$fqdn_hostname/g" %{_sysconfdir}/gwms-frontend/frontend.xml
 
+# If the startup log exists, change the ownership to frontend user
+# Ownership was fixed in v3.2.4 with the init script templates rewrite
+if [ -f %{_localstatedir}/log/gwms-frontend/frontend/startup.log ]; then
+    chown frontend.frontend %{_localstatedir}/log/gwms-frontend/frontend/startup.log
+fi
+
 /sbin/chkconfig --add gwms-frontend
 if [ ! -e %{frontend_dir}/monitor ]; then
     ln -s %{web_dir}/monitor %{frontend_dir}/monitor
@@ -461,23 +471,30 @@ if [ "$1" = "1" ] ; then
 fi
 
 %pre vofrontend-standalone
-
-# Add the "frontend" user 
+# Add the "frontend" user and group if they do not exist
 getent group frontend >/dev/null || groupadd -r frontend
 getent passwd frontend >/dev/null || \
        useradd -r -g frontend -d /var/lib/gwms-frontend \
 	-c "VO Frontend user" -s /sbin/nologin frontend
+# If the frontend user already exists make sure it is part of frontend group
+usermod --append --groups frontend frontend >/dev/null
 
 %pre factory
-# Add the "gfactory" user 
+# Add the "gfactory" user and group if they do not exist
 getent group gfactory >/dev/null || groupadd -r gfactory
 getent passwd gfactory >/dev/null || \
        useradd -r -g gfactory -d /var/lib/gwms-factory \
 	-c "GlideinWMS Factory user" -s /sbin/nologin gfactory
+# If the gfactory user already exists make sure it is part of gfactory group
+usermod --append --groups gfactory gfactory >/dev/null
+
+# Add the "frontend" user and group if they do not exist
 getent group frontend >/dev/null || groupadd -r frontend
 getent passwd frontend >/dev/null || \
        useradd -r -g frontend -d /var/lib/gwms-frontend \
 	-c "VO Frontend user" -s /sbin/nologin frontend
+# If the frontend user already exists make sure it is part of frontend group
+usermod --append --groups frontend frontend >/dev/null
 
 %preun vofrontend-standalone
 # $1 = 0 - Action is uninstall
@@ -544,6 +561,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/info_glidein
 %attr(755,root,root) %{_sbindir}/manageFactoryDowntimes.py
 %attr(755,root,root) %{_sbindir}/reconfig_glidein
+%attr(755,root,root) %{_sbindir}/clone_glidein
 %attr(-, root, root) %dir %{_localstatedir}/lib/gwms-factory
 %attr(-, root, root) %{_localstatedir}/lib/gwms-factory/client-proxies
 %attr(-, gfactory, gfactory) %{factory_web_dir}
@@ -593,7 +611,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/glideinwms/creation/lib/__init__.py
 %{python_sitelib}/glideinwms/creation/lib/__init__.pyc
 %{python_sitelib}/glideinwms/creation/lib/__init__.pyo
+%if %{v3_plus}
 %{python_sitelib}/glideinwms/creation/templates/factory_initd_startup_template
+%endif
 %{python_sitelib}/glideinwms/factory
 %{python_sitelib}/glideinwms/lib
 %{python_sitelib}/glideinwms/tools
@@ -661,7 +681,9 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/glideinwms/creation/lib/__init__.py
 %{python_sitelib}/glideinwms/creation/lib/__init__.pyc
 %{python_sitelib}/glideinwms/creation/lib/__init__.pyo
+%if %{v3_plus}
 %{python_sitelib}/glideinwms/creation/templates/frontend_initd_startup_template
+%endif
 %{_initrddir}/gwms-frontend
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/gwms-frontend.conf
 %attr(-, frontend, frontend) %dir %{_sysconfdir}/gwms-frontend
@@ -676,8 +698,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/condor/config.d/00_gwms_factory_general.config
 %config(noreplace) %{_sysconfdir}/condor/config.d/01_gwms_factory_collectors.config
 %config(noreplace) %{_sysconfdir}/condor/config.d/02_gwms_factory_schedds.config
-%config(noreplace) %{_sysconfdir}/condor/config.d/03_gwms_factory_local.config
-%config(noreplace) %{_sysconfdir}/condor/config.d/11_gwms_factory_secondary_collectors.config
+%config(noreplace) %{_sysconfdir}/condor/config.d/03_gwms_local.config
 %config(noreplace) %{_sysconfdir}/condor/privsep_config
 %config(noreplace) %{_sysconfdir}/condor/certs/condor_mapfile
 %attr(-, condor, condor) %{_localstatedir}/lib/condor/schedd_glideins2
@@ -687,7 +708,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files usercollector
 %config(noreplace) %{_sysconfdir}/condor/config.d/01_gwms_collectors.config
+%config(noreplace) %{_sysconfdir}/condor/config.d/01_gwms_ganglia.config
 %config(noreplace) %{_sysconfdir}/condor/config.d/11_gwms_secondary_collectors.config
+%config(noreplace) %{_sysconfdir}/condor/ganglia.d/01_gwms_metrics.config
 
 %files userschedd
 %config(noreplace) %{_sysconfdir}/condor/config.d/02_gwms_schedds.config
@@ -712,6 +735,105 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jun 01 2015 Parag Mhashilkar <parag@fnal.gov> - 3.2.10-1
+- Glideinwms v3.2.10 release
+- Release Notes: http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/history.html
+
+* Fri May 08 2015 Parag Mhashilkar <parag@fnal.gov> - 3.2.9-1
+- Glideinwms v3.2.9 release
+- Release Notes: http://www.uscms.org/SoftwareComputing/Grid/WMS/glideinWMS/doc.prd/history.html
+
+* Thu May 07 2015 Parag Mhashilkar <parag@fnal.gov> - 3.2.9-0.2.rc2
+- Glideinwms v3.2.9 rc2 release
+
+* Fri Apr 24 2015 Parag Mhashilkar <parag@fnal.gov> - 3.2.9-0.1.rc1
+- Glideinwms v3.2.9 rc1 release
+
+* Tue Dec 30 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.8-1
+- Glideinwms v3.2.8 release
+
+* Mon Dec 29 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.8-0.2.rc1
+- Fixed install location of 01_gwms_metrics.config to /etc/condor/ganglia.d
+
+* Mon Dec 22 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.8-0.1.rc1
+- Glideinwms v3.2.8 rc1 release
+
+* Wed Nov 6 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.7.2-1
+- Glideinwms v3.2.7.2 release
+- Sets MASTER.USE_SHARED_PORT in schedd's config to support HTCondor v8.2.3
+
+* Wed Nov 5 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.7.1-1
+- Glideinwms v3.2.7.1 release
+
+* Tue Oct 14 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.7-1
+- Glideinwms v3.2.7 release
+
+* Mon Oct 8 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.7-0.2.rc2
+- Glideinwms v3.2.7 rc2 release
+
+* Mon Oct 6 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.7-0.1.rc1
+- Glideinwms v3.2.7 rc1 release
+- Disabled secondarsy schedd in the frontend configuration
+- Added python-ldap as dependency to glideinwms-libs and glideinwms-factory
+
+* Fri Jul 25 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.6-1
+- Glideinwms v3.2.6 release
+
+* Fri Jul 25 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.6-0.3.rc3
+- Glideinwms v3.2.6 rc3 release
+- Reverted group name in default dir ownership but we now explicitly make gfactory and fronend users part of the gfactory and frontend group respectively
+
+* Fri Jul 18 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.6-0.2.rc2
+- Glideinwms v3.2.6 rc2 release
+
+* Wed Jul 9 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.6-0.1.rc1
+- Glideinwms v3.2.6 rc1 release
+- Removed the group name in the default dir ownership for factory and frontend
+
+* Wed Jun 25 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5.1-2
+- Added GOC factory info in the factory config template
+
+* Mon Jun 23 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5.1-1
+- Glideinwms v3.2.5.1 release
+
+* Mon May 19 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5-1
+- Glideinwms v3.2.5 release
+
+* Tue May 13 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5-0.3.rc3
+- Glideinwms v3.2.5 rc3 release
+
+* Mon May 5 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5-0.2.rc2
+- Glideinwms v3.2.5 rc2 release
+
+* Fri May 2 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.5-0.1.rc1
+- Glideinwms v3.2.5 rc1 release
+- Change the default trust_domain in frontend.xml from OSG to grid
+
+* Mon Apr 28 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.4-3
+- Fix the ownership of startup.log file for frontend in post script
+- Changed the javascriptrrd dependency to be 1.1.0+ for frontend as well
+
+* Mon Apr 16 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.4-2
+- Changed the javascriptrrd dependency to be 1.1.0+
+
+* Mon Apr 14 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.4-1
+- Glideinwms v3.2.4 release
+- Unified the factory and frontend startup scripts in rpm and tarball versions from common templates
+
+* Mon Feb 03 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.3-1
+- Glideinwms v3.2.3 release
+- Final release does not include support for HTCondor CE rsl
+
+* Wed Jan 22 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.3-0.3.rc3
+- Support for HTCondor CE rsl and improvements to Frontend
+
+* Wed Jan 15 2014 Parag Mhashilkar <parag@fnal.gov> - 3.2.3-0.2.rc2
+- Bug fixes to factory log cleanup
+
+* Tue Dec 17 2013 Parag Mhashilkar <parag@fnal.gov> - 3.2.3-0.1.rc1
+- New features and bug fixes
+- Added clone_glidein tool
+
 * Mon Oct 28 2013 Parag Mhashilkar <parag@fnal.gov> - 3.2.1-0.1.rc2
 - Added gwms-frontend and gwms-factory files in /etc/sysconfig in the respective rpms
 - Added new files, xslt.* to the list for respective rpms
@@ -722,8 +844,14 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Oct 10 2013 Parag Mhashilkar <parag@fnal.gov> - 3.2.0-2
 - Fixed the NVR int the rpm version as per the convention
 
+* Mon Sep 09 2013 John Weigand <weigand@fnal.gov> - 2.7.2-0.1.rc3
+- No code changes from rc2. Just a change to Requires (dependencies) to insure that the entire set of glideinwms rpms is updated as a set.
+
 * Mon Aug 26 2013 Parag Mhashilkar <parag@fnal.gov> - 3.2-0.2.rc2
 - Updated the frontend.xml and added update_proxy.py while generating the checksum for the version
+
+* Mon Aug 26 2013 Parag Mhashilkar <parag@fnal.gov> - 2.7.2-0.1.rc2
+- Add update_proxy.py while generating the checksum for the version
 
 * Wed Jun 5 2013 Parag Mhashilkar <parag@fnal.gov> - 2.7.1-1.1
 - Check existence of link before creating it to avoid scriptlet error.
@@ -731,7 +859,6 @@ rm -rf $RPM_BUILD_ROOT
 * Mon May 13 2013 Parag Mhashilkar <parag@fnal.gov> - 2.7.1-0.rc1.4
 - Removed libs directory from the vofrontend-standalone and added glideinwms-libs as its dependency.
 
-* Thu May 9 2013 Parag Mhashilkar <parag@fnal.gov> - 2.7.1-0.rc1.2
 * Fri May 10 2013 Parag Mhashilkar <parag@fnal.gov> - 2.7.1-0.rc1.3
 - Reverted the changes made in 2.7.1-0.rc1.2. Removed condor_q as a requirement whereever we require condor as this creates more conflicts.
 
