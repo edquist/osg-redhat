@@ -1,4 +1,4 @@
-%define tarball_version 8.3.6
+%define tarball_version 8.5.0
 
 # optionally define any of these, here or externally
 # % define fedora   16
@@ -93,6 +93,13 @@
 %define std_univ 0
 %endif
 %endif
+%if ( 0%{?osg} && 0%{?rhel} == 7 )
+    %define aviary 0
+    %define std_univ 0
+    %define cream 0
+
+    %define suffix _nocream
+%endif
 
 %define glexec 1
 
@@ -118,13 +125,13 @@ Version: %{tarball_version}
 
 # Only edit the %condor_base_release to bump the rev number
 %define condor_git_base_release 0.1
-%define condor_base_release 1.1
+%define condor_base_release 1.2
 %if %git_build
         %define condor_release %condor_git_base_release.%{git_rev}.git
 %else
         %define condor_release %condor_base_release
 %endif
-Release: %condor_release%{?dist}
+Release: %condor_release%{?suffix}%{?dist}
 
 License: ASL 2.0
 Group: Applications/System
@@ -208,12 +215,11 @@ Source123: zlib-1.2.3.tar.gz
 
 Patch1: sw1636-cream_gahp-dlopen.patch
 
-# Needed for EL5, not sure whether upstream will revert them.
-# https://jira.opensciencegrid.org/browse/SOFTWARE-1921
-# https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=4910
-# https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=4998
-Patch2: sw1921-revert-4910.patch
-
+# should make it into upstream 8.4.1
+# https://htcondor-wiki.cs.wisc.edu/index.cgi/tktview?tn=5288
+# https://jira.opensciencegrid.org/browse/SOFTWARE-2039
+# Not needed anymore for 8.5.0
+#Patch2: gt5288-NETWORK_HOSTNAME.patch
 
 #% if 0%osg
 Patch8: osg_sysconfig_in_init_script.patch
@@ -605,6 +611,17 @@ Group: Applications/System
 Requires: python >= 2.2
 Requires: %name = %version-%release
 
+%if 0%{?rhel} >= 7
+# auto provides generator does not pick these up for some reason
+    %ifarch x86_64
+Provides: classad.so()(64bit)
+Provides: htcondor.so()(64bit)
+    %else
+Provides: classad.so
+Provides: htcondor.so
+    %endif
+%endif
+
 %description python
 The python bindings allow one to directly invoke the C++ implementations of
 the ClassAd library and HTCondor from python
@@ -708,9 +725,6 @@ exit 0
 
 %patch1 -p1
 
-%if 0%{?rhel} < 6
-%patch2 -p1
-%endif
 
 %if 0%{?hcc}
 %patch15 -p0
@@ -731,7 +745,7 @@ export CMAKE_PREFIX_PATH=/usr
 # causes build issues with EL5, don't even bother building the tests.
 
 %if %uw_build
-%define condor_build_id 325064
+%define condor_build_id 341253
 
 %cmake \
        -DBUILDID:STRING=%condor_build_id \
@@ -931,10 +945,6 @@ mkdir -p -m1777 %{buildroot}/%{_var}/lock/condor/local
 mkdir -p -m0755 %{buildroot}/%{_var}/lib/condor/spool
 mkdir -p -m1777 %{buildroot}/%{_var}/lib/condor/execute
 
-# no master shutdown program for now
-rm -f %{buildroot}/%{_sbindir}/condor_set_shutdown
-rm -f %{buildroot}/%{_mandir}/man1/condor_set_shutdown.1
-
 # not packaging deployment tools
 rm -f %{buildroot}/%{_mandir}/man1/condor_config_bind.1
 rm -f %{buildroot}/%{_mandir}/man1/condor_cold_start.1
@@ -1001,13 +1011,11 @@ rm -rf %{buildroot}%{_sbindir}/condor_cold_start
 rm -rf %{buildroot}%{_sbindir}/condor_cold_stop
 rm -rf %{buildroot}%{_sbindir}/condor_config_bind
 rm -rf %{buildroot}%{_sbindir}/condor_configure
-rm -rf %{buildroot}%{_sbindir}/condor_credd
 rm -rf %{buildroot}%{_sbindir}/condor_install
 rm -rf %{buildroot}%{_sbindir}/condor_install_local
 rm -rf %{buildroot}%{_sbindir}/condor_local_start
 rm -rf %{buildroot}%{_sbindir}/condor_local_stop
 rm -rf %{buildroot}%{_sbindir}/condor_startd_factory
-rm -rf %{buildroot}%{_sbindir}/condor_vm-gahp-vmware
 rm -rf %{buildroot}%{_sbindir}/condor_vm_vmware.pl
 rm -rf %{buildroot}%{_sbindir}/filelock_midwife
 rm -rf %{buildroot}%{_sbindir}/filelock_undertaker
@@ -1064,7 +1072,6 @@ rm -rf %{buildroot}%{_mandir}/man1/condor_compile.1*
 rm -rf %{buildroot}%{_mandir}/man1/condor_config_bind.1*
 rm -rf %{buildroot}%{_mandir}/man1/condor_configure.1*
 rm -rf %{buildroot}%{_mandir}/man1/condor_load_history.1*
-rm -rf %{buildroot}%{_mandir}/man1/condor_set_shutdown.1*
 rm -rf %{buildroot}%{_mandir}/man1/filelock_midwife.1*
 rm -rf %{buildroot}%{_mandir}/man1/filelock_undertaker.1*
 rm -rf %{buildroot}%{_mandir}/man1/install_release.1*
@@ -1167,6 +1174,7 @@ rm -rf %{buildroot}
 %_libdir/libcondor_utils_%{version_}.so
 %_libdir/libcondorapi.so
 %dir %_libexecdir/condor/
+%_libexecdir/condor/linux_kernel_tuning
 %_libexecdir/condor/accountant_log_fixer
 %_libexecdir/condor/condor_chirp
 %_libexecdir/condor/condor_ssh
@@ -1244,6 +1252,7 @@ rm -rf %{buildroot}
 %_mandir/man1/condor_restart.1.gz
 %_mandir/man1/condor_rm.1.gz
 %_mandir/man1/condor_run.1.gz
+%_mandir/man1/condor_set_shutdown.1.gz
 %_mandir/man1/condor_sos.1.gz
 %_mandir/man1/condor_stats.1.gz
 %_mandir/man1/condor_status.1.gz
@@ -1325,6 +1334,7 @@ rm -rf %{buildroot}
 %_sbindir/condor_c-gahp
 %_sbindir/condor_c-gahp_worker_thread
 %_sbindir/condor_collector
+%_sbindir/condor_credd
 %_sbindir/condor_fetchlog
 %_sbindir/condor_had
 %_sbindir/condor_init
@@ -1338,6 +1348,7 @@ rm -rf %{buildroot}
 %_sbindir/condor_restart
 %attr(6755, root, root) %_sbindir/condor_root_switchboard
 %_sbindir/condor_schedd
+%_sbindir/condor_set_shutdown
 %_sbindir/condor_shadow
 %_sbindir/condor_sos
 %_sbindir/condor_startd
@@ -1360,6 +1371,7 @@ rm -rf %{buildroot}
 %_sbindir/boinc_gahp
 %endif
 %_libexecdir/condor/condor_gpu_discovery
+%_sbindir/condor_vm-gahp-vmware
 %_sbindir/condor_vm_vmware
 %config(noreplace) %_sysconfdir/condor/ganglia.d/00_default_metrics
 %defattr(-,condor,condor,-)
@@ -1840,6 +1852,40 @@ fi
 %endif
 
 %changelog
+* Wed Oct 21 2015 Edgar Fajardo <emfajard@ucsd.edu> - 8.5.0-1.1
+- Removed patch #5288
+- Update to 8.5.0
+
+* Fri Oct 02 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.4.0-1.2
+- patch to fix broken NETWORK_HOSTNAME (#5288)
+
+* Mon Sep 21 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.4.0-1.1
+- update to 8.4.0 and drop revert-gt4903.patch (SOFTWARE-2039)
+
+* Wed Sep 09 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 8.3.8-1.2
+- Patch to revert GT #4903
+
+* Mon Aug 31 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.3.8-1.1
+- update to 8.3.8 (SOFTWARE-1995)
+
+* Wed Aug 19 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.3.7-1.2
+- different build fix for PROPER, taken from 8.3.8 (SOFTWARE-1995)
+
+* Mon Aug 17 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.3.7-1.1
+- update to 8.3.7, build fix for PROPER (SOFTWARE-1995)
+
+* Tue Aug 04 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.3.6-1.4
+- pull in #5181 and #5181 from 8.3.8 (SOFTWARE-1991)
+
+* Tue Jul 21 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 8.3.6-1.3_nocream.osg
+- Provide htcondor.so and classad.so in condor-python on el7
+
+* Mon Jul 20 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 8.3.6-1.2_nocream.osg
+- Turn off features for osg that don't (yet) build on el7
+  - cream
+  - aviary
+  - std universe
+
 * Wed Jun 24 2015 Brian Lin <blin@cs.wisc.edu> - 8.3.6-1.1
 - Bump version to 8.3.6
 - Drop patch reverting gittrac #4998
@@ -1850,7 +1896,7 @@ fi
 * Tue Apr 28 2015 Carl Edquist <edquist@cs.wisc.edu> - 8.3.5-2
 - Drop NO_PNONE_HOME option; ie, always phone home (SOFTWARE-1897)
 
-* Fri Mar 24 2015 Jose Caballero <jcaballero@bnl.gov> - 8.3.5-1.315103
+* Tue Mar 24 2015 Jose Caballero <jcaballero@bnl.gov> - 8.3.5-1.315103
 - Update to HTCondor 8.3.5 (SOFTWARE-1886)
 - merged all changes in spec file from 8.3.5
 - removed Patch2 sw1807-py_import.patch
