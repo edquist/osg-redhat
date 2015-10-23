@@ -2,13 +2,16 @@
 #define gitrev osg
 
 Name: htcondor-ce
-Version: 1.14
-Release: 3%{?gitrev:.%{gitrev}git}%{?dist}
+Version: 1.17
+Release: 1%{?gitrev:.%{gitrev}git}%{?dist}
 Summary: A framework to run HTCondor as a CE
 
 Group: Applications/System
 License: Apache 2.0
 URL: http://github.com/bbockelm/condor-ce
+
+# _unitdir not defined on el6 build hosts
+%{!?_unitdir: %global _unitdir %{_prefix}/lib/systemd/system}
 
 # Generated with:
 # git archive --prefix=%{name}-%{version}/ v%{version} | gzip > %{name}-%{version}.tar.gz
@@ -17,8 +20,7 @@ URL: http://github.com/bbockelm/condor-ce
 # git archive --prefix=%{name}-%{version}/ %{gitrev} | gzip > %{name}-%{version}-%{gitrev}.tar.gz
 #
 Source0: %{name}-%{version}%{?gitrev:-%{gitrev}}.tar.gz
-Patch0: sw1910_run_without_r.patch
-Patch1: drop_userHome.patch
+Patch0: drop_userHome.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -119,7 +121,7 @@ BuildRequires: cmake
 Requires: condor
 Requires: /usr/bin/grid-proxy-init
 Requires: /usr/bin/voms-proxy-init
-Requires: grid-certificates
+Requires: grid-certificates >= 7
 
 # Require the appropriate version of the python library.  This
 # is rather awkward, but better syntax isn't available until RHEL6
@@ -149,12 +151,6 @@ Conflicts: %{name}
 %prep
 %setup -q
 %patch0 -p1
-# Due to SOFTWARE-1921, we are not shipping HTCondor > 8.3.4 for EL5 in upcoming.
-# Since the userHome function was included in 8.3.6+, we cannot drop the function
-# from the CE yet.
-%if 0%{?rhel} >= 6
-%patch1 -p1
-%endif
 
 %build
 %cmake -DHTCONDORCE_VERSION=%{version} -DCMAKE_INSTALL_LIBDIR=%{_libdir} -DPYTHON_SITELIB=%{python_sitelib}
@@ -164,6 +160,12 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 
 make install DESTDIR=$RPM_BUILD_ROOT
+
+%if %{?rhel} >= 7
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+install -m 0644 config/condor-ce.service $RPM_BUILD_ROOT/%{_unitdir}/condor-ce.service
+install -m 0644 config/condor-ce-collector.service $RPM_BUILD_ROOT/%{_unitdir}/condor-ce-collector.service
+%endif
 
 # Directories necessary for HTCondor-CE files
 install -m 0755 -d -p $RPM_BUILD_ROOT/%{_localstatedir}/run/condor-ce
@@ -203,12 +205,13 @@ fi
 
 %{_datadir}/condor-ce/condor_ce_router_defaults
 
-%if 0%{?rhel} < 6
-%{_libdir}/condor/libclassad_ce.so
-%endif
 %{_libdir}/condor/libeval_rsl.so
 
 %{_initrddir}/condor-ce
+
+%if %{?rhel} >= 7
+%{_unitdir}/condor-ce.service
+%endif
 
 %config(noreplace) %{_sysconfdir}/condor-ce/config.d/01-ce-auth.conf
 %config(noreplace) %{_sysconfdir}/condor-ce/config.d/01-ce-router.conf
@@ -223,6 +226,8 @@ fi
 %{_datadir}/condor-ce/config.d/03-managed-fork-defaults.conf
 
 %{_datadir}/condor-ce/osg-wrapper
+
+%{_bindir}/condor_ce_host_network_check
 
 %attr(-,condor,condor) %dir %{_localstatedir}/run/condor-ce
 %attr(-,condor,condor) %dir %{_localstatedir}/log/condor-ce
@@ -306,6 +311,10 @@ fi
 %{_datadir}/condor-ce/config.d/01-ce-collector-defaults.conf
 %{_datadir}/condor-ce/config.d/01-ce-auth-defaults.conf
 
+%if %{?rhel} >= 7
+%{_unitdir}/condor-ce-collector.service
+%endif
+
 %config(noreplace) %{_sysconfdir}/sysconfig/condor-ce-collector
 %config(noreplace) %{_sysconfdir}/condor-ce/config.d/01-ce-collector.conf
 %config(noreplace) %{_sysconfdir}/condor-ce/config.d/01-ce-collector-requirements.conf
@@ -326,8 +335,30 @@ fi
 %attr(1777,root,root) %dir %{_localstatedir}/lib/gratia/condorce_data
 
 %changelog
-* Wed Jul 01 2015 Brian Lin <blin@cs.wisc.edu> - 1.14-3
-- Only drop userHome function for EL6 since we are not shipping HTCondor 8.3.6+ for EL5
+* Fri Oct 23 2015 Edgar Fajardo <emfajard@ucsd.edu> - 1.17-1
+- Allow users to append lines to JOB_ROUTER_DEFAULTS (SOFTWARE-2065)
+- Allow users to add onto accounting group defaults set by the job router (SOFTWARE-2067)
+- Built against condor 8.5.0
+
+* Mon Sep 25 2015 Brian Lin <blin@cs.wisc.edu> - 1.16-1
+- Add network troubleshooting tool (condor_ce_host_network_check)
+- Add ability to disable glideins advertising to the CE
+- Add non-DigiCert hostcerts for CERN
+- Improvements to 'condor_ce_run' error messages
+
+* Mon Aug 31 2015 Carl Edquist <edquist@cs.wisc.edu> - 1.15-2
+- bump release to rebuild against condor 8.3.8 (SOFTWARE-1995)
+
+* Fri Aug 21 2015 Brian Lin <blin@cs.wisc.edu> 1.15-1
+- Add 'default_remote_cerequirements' attribute to the JOB_ROUTER_DEFAULTS
+- Verify the first route in JOB_ROUTER_ENTRIES in the init script
+- htcondor-ce-collecotr now uses /etc/sysconfig/condor-ce-collector for additional configuration
+
+* Mon Jul 20 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 1.14-4
+- bump to rebuild
+
+* Wed Jul 01 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 1.14-3
+- Require grid-certificates >= 7 (SOFTWARE-1883)
 
 * Tue Jun 30 2015 Brian Lin <blin@cs.wisc.edu> - 1.14-2
 - Authorization fix when running condor_ce_run without '-r' (SOFTWARE-1910)
@@ -340,6 +371,10 @@ fi
 - HTCondor CE should warn if osg-configure has not been run (SOFTWARE-1914)
 - Improvements to condor_ce_run error messages
 - Drop userHome function since it's included in upstream HTCondor 8.3.6
+
+* Fri Jun 19 2015 Mátyás Selmeci <matyas@cs.wisc.edu> 1.13-3
+- Add basic systemd service files for condor-ce and condor-ce-collector (SOFTWARE-1541)
+- Fix name and description in the LSB lines in the init scripts
 
 * Mon Apr 27 2015 Brian Lin <blin@cs.wisc.edu> - 1.13-1
 - Fix bug that prevented HTCondor CE service from starting with multiple job routes
@@ -371,7 +406,7 @@ fi
 * Tue Jan 06 2015 Brian Lin <blin@cs.wisc.edu> - 1.9-2
 - Fix HTCondor jobs routing incorrectly in 8.3.x
 
-* Fri Dec 18 2014 Brian Lin <blin@cs.wisc.edu> - 1.9-1
+* Thu Dec 18 2014 Brian Lin <blin@cs.wisc.edu> - 1.9-1
 - Add auth file to the collector RPM.
 - Updates and fixes to condor_ce_info_status and condor_ce_trace
 - Fixes to default security settings
