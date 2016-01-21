@@ -1,0 +1,65 @@
+#!/bin/bash
+set -e
+
+[[ $REPO ]] || REPO=https://github.com/edquist/osg-redhat
+
+usage () {
+  echo "$(basename "$0") pattern [...]"
+  echo "$(basename "$0") {-a|--all}"
+  echo "$(basename "$0") {-p|--package[s]} package [...]"
+  echo "$(basename "$0") {-b|--branch[es]} branch [...]"
+  echo "$(basename "$0") {-l|--list-branches}"
+  echo
+  echo "examples:"
+  echo "  $(basename "$0") '*/rsv*'"
+  echo "  $(basename "$0") -p condor"
+  echo "  $(basename "$0") -b osg-3.1"
+  echo "  $(basename "$0") -l"
+  exit
+}
+
+case $1 in
+  --all | -a )
+      [[ ! $2 ]] || usage
+      shift
+      mode=all ;;
+
+  --list-branches | -l )
+      [[ ! $2 ]] || usage
+      shift
+      mode=list-branches ;;
+
+  --package | --packages | --pkgs | -p )
+      [[ $2 ]] || usage
+      shift
+      mode=pkgs ;;
+
+  --branch | --branches | -b )
+      [[ $2 ]] || usage
+      shift
+      mode=branches ;;
+
+  -* ) usage ;;
+   * ) [[ $1 ]] || usage
+       mode=patterns ;;
+esac
+
+if [[ $1 ]]; then
+  case $mode in
+    pkgs     ) set -- "${@/#/*/}" ;;
+    branches ) set -- "${@/%//*}" ;;
+  esac
+
+  set -- "${@//\?/.}"
+  set -- "${@//\*/.*}"
+  set -- "${@/#/^}"
+  set -- "${@/%/$}"
+  set -- "${@/#/-e}"
+
+  git ls-remote --heads "$REPO" | cut -d/ -f3- | egrep "$@"
+elif [[ $mode = list-branches ]]; then
+  git ls-remote --heads "$REPO" | cut -d/ -f3 | sort -u
+else
+  git ls-remote --heads "$REPO" | cut -d/ -f3-
+fi
+

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+usage () {
+  echo "$(basename "$0") {checkout|list}"
+  exit
+}
+
+case $1 in
+  checkout|list ) exec "$0-$@" ;;
+              * ) usage ;;
+esac

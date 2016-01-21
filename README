@@ -1,0 +1,45 @@
+This is a new take on migrating the OSG packaging area to git, with
+per-project branches of https://vdt.cs.wisc.edu/svn/native/redhat 
+
+:: The other ways ::
+
+Having a single git repo that contains all projects (eg, master corresponds
+to https://vdt.cs.wisc.edu/svn/native/redhat/trunk) has the downsides of
+(1) needing to check out all projects at once, instead of just individual
+projects, and (2) merges done in svn for changes within a single project
+across series/branches (eg, trunk -> osg-3.2) will not appear as merges in
+the top-level repo, and applying future changes between series/branches will
+have to be done as cherry-picks instead of real merges, in order to get just
+the changes for a particular project.  (Relatedly, (3) doing a diff between
+branches will show differences for all projects, although this can be worked-
+around by also specifying an explicit path for the git-diff command.)
+
+Having one git repo per-project addresses the above problems, but becomes
+unwieldy, especially if hosted on github.  The main difficulty is that listing
+all (~185) projects is non-trivial if hosted on github, and it essentially
+requires its own github user or organization with no other (non-packaging)
+repos, in order to avoid confusion.  Further, listing the projects that exist
+in a particular series/branch is really not an option.
+
+:: The crazy new take ::
+
+The new approach here is to have a single git repo containing all projects,
+but to continue to have one branch per series/project pair.  Thus,
+osg-3.2/condor, trunk/condor, and upcoming/condor are all branches of the
+condor packaging, and so on for every other project.  It then becomes possible
+to list all branches for a particular project (*/condor) or all projects
+for a particular branch/series (osg-internal/*).  At the same time only
+one project needs to be checked out (instead of all together), merges
+between series/branches appear as real merges, and diffs between series
+branches show just the changes within a single project.
+
+Of course, this means a lot of branches exist total, but not all need to exist
+as local branches (or even be contained in the local repo as remotes), and
+a couple scripts have been provided to make the routine stuff even easier:
+
+  osg-redhat list       - lists various info about series & packages
+
+  osg-redhat checkout   - checks out branches for a project or series
+
+Run either with no arguments for usage help.
+

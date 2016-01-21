@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e
+
+[[ $REPO ]] || REPO=https://github.com/edquist/osg-redhat
+
+usage () {
+  echo "$(basename "$0") --all [--track] [dest]"
+  echo "$(basename "$0") --pkgs pkg1 [pkg2 ...] [--] [--track] [dest]"
+  echo "$(basename "$0") package [dest]"
+  exit
+}
+
+mode=
+track=
+pkgs=()
+dest=${REPO##*/}
+
+case $1 in
+         '' ) usage ;;
+  --all |-a ) mode=all; shift ;;
+  --pkgs|-p ) mode=pkgs; shift
+              while [[ $1 && $1 != -* ]]; do
+                pkgs+=("$1")
+                shift
+              done ;;
+         -* ) usage ;;
+          * ) mode=single
+              pkgs=$1
+              dest=$1
+              shift ;;
+esac
+
+while [[ $1 = -* ]]; do
+case $1 in
+  --track ) track=Y ;;
+  -- ) ;;
+  * ) usage ;;
+esac
+shift
+done
+
+[[ ! $1 ]] || dest=$1
+
+case $mode in
+  all ) git clone "$REPO" "$dest"
+        cd "$dest" ;;
+
+    * ) mkdir "$dest"
+        cd "$dest"
+        git init
+        git remote add origin "$REPO"
+        git remote set-branches origin "${pkgs[@]/#/*/}"
+        git fetch ;;
+esac
+
+if [[ $mode = single ]]; then
+  git branch -r | awk -F/ '{print $2,$0}' | xargs -L 1 git branch --track
+  if git rev-parse --verify -q refs/heads/trunk >/dev/null; then
+    git checkout trunk
+  fi
+fi
+
+if [[ $track ]]; then
+  for r in $(git branch -r); do
+    git branch --track "${r#*/}" "$r"
+  done
+fi
+
